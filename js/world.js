@@ -509,7 +509,7 @@
       if (c.proj) c.proj.hitstop = Math.min(d.hsd, 6);
       this.gain(att.idx, d.gain);
       if (ch) this.fx.push({ type: 'text', x: def.x, y: def.y + 240, text: 'COUNTER', t: 0, life: 40, color: '#d22' });
-      this.fx.push({ type: 'hit', x: c.box.cx - SO.sign(c.box.cx - def.x) * c.box.w * 0.25, y: c.box.cy, t: 0, life: 14, size: 30 + Math.min(70, dmg), color: ch ? '#d22' : '#222' });
+      this.fx.push({ type: 'hit', x: c.box.cx - SO.sign(c.box.cx - def.x) * c.box.w * 0.25, y: c.box.cy, t: 0, life: 14, size: 18 + Math.min(40, dmg * 0.6), color: ch ? '#d22' : '#222' });
       SO.FXR.onHit(this, c, dmg, ch);
       this.stats.comboDmg = def.combo.dmg;
       this.stats.comboHits = def.combo.hits;

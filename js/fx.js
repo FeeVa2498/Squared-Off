@@ -184,7 +184,7 @@
         const a = Math.random() * Math.PI * 2, sp = rnd(6, 12 + lvl * 4);
         emit(W, 'spark', x, y, { vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, drag: 0.86, life: 10 + lvl * 2, size: 3 + lvl, color: i % 3 ? col : (ch ? '#ffb000' : '#ffe680') });
       }
-      W.fx.push({ type: 'impact', x, y, t: 0, life: 8 + lvl * 3, size: 40 + lvl * 30, color: ch ? '#d22' : '#222', lvl });
+      W.fx.push({ type: 'impact', x, y, t: 0, life: 8 + lvl * 3, size: 24 + lvl * 16, color: ch ? '#d22' : '#222', lvl });
       if (lvl >= 2) W.screenFlash = { t: 0, life: lvl === 3 ? 8 : 4, color: ch ? 'rgba(255,60,40,0.3)' : 'rgba(255,255,255,0.35)' };
       if (lvl >= 2) W.quake = Math.max(W.quake, 4 + lvl * 2);
       // hiệu ứng theo nguyên tố khi trúng

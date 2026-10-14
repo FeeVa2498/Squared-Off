@@ -5,7 +5,7 @@
 (function () {
   const SO = window.SO;
   const C = SO.CFG;
-  const R = (SO.R = { debug: false, frameData: true, W: 1920, H: 1080, GROUND: 850, cam: { x: 440, scale: 1, offY: 0, init: false } });
+  const R = (SO.R = { debug: false, frameData: true, W: 1920, H: 1080, GROUND: 905, cam: { x: 440, scale: 1, offY: 0, init: false } });
   const FONT = '"Patrick Hand", "Comic Sans MS", "Chalkboard SE", cursive';
   R.FONT = FONT;
   const INK = '#2a2a2a';
@@ -170,7 +170,11 @@
     const camX = SO.clamp(mid - viewW / 2, 0, C.STAGE_W - viewW);
     const top = Math.max(a.y + a.c.h, b.y + b.c.h);
     // chỉ nâng camera khi nhân vật bay cao gần chạm HUD
-    const offY = Math.max(0, top - (R.GROUND - 210) * (C.VIEW_W / R.W));
+    // camera nâng lên khi có người bay cao, nhưng người đứng dưới đất vẫn phải thấy phần lớn thân
+    const sc0 = R.W / C.VIEW_W;
+    const low = a.y < b.y ? a : b;
+    const maxOff = (R.H - R.GROUND) / sc0 + Math.max(0, low.y) + low.c.h * 0.3;
+    const offY = Math.min(maxOff, Math.max(0, top - (R.GROUND - 190) / sc0));
     const cam = R.cam;
     if (!cam.init) { cam.x = camX; cam.scale = scale; cam.offY = offY; cam.init = true; }
     cam.x = camX;
@@ -931,7 +935,8 @@
         break;
       }
       case 'text': {
-        ctx.font = (e.big ? 'bold 52px ' : 'bold 36px ') + FONT;
+        const ts = Math.min(1, 1.5 / (R.cam.scale || 1));
+        ctx.font = 'bold ' + Math.round((e.big ? 52 : 36) * ts) + 'px ' + FONT;
         ctx.textAlign = 'center';
         ctx.lineWidth = 6;
         ctx.strokeStyle = '#fff';
@@ -1069,7 +1074,7 @@
     if (e.type === 'impact') {
       ctx.globalAlpha = 1 - k;
       const n = 8 + e.lvl * 4, r0 = e.size * (0.3 + k), r1 = e.size * (0.8 + k * 1.6);
-      ctx.strokeStyle = e.color; ctx.lineWidth = 3 + e.lvl; ctx.lineCap = 'round';
+      ctx.strokeStyle = e.color; ctx.lineWidth = 2 + e.lvl * 0.6; ctx.lineCap = 'round';
       ctx.beginPath();
       for (let i = 0; i < n; i++) {
         const a = (i / n) * 6.28 + e.x * 0.01;
@@ -1077,7 +1082,7 @@
         ctx.lineTo(e.x + Math.cos(a) * r1 * (i % 2 ? 0.7 : 1), -e.y + Math.sin(a) * r1 * (i % 2 ? 0.7 : 1));
       }
       ctx.stroke();
-      if (e.lvl >= 1) { ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(e.x, -e.y, e.size * (0.4 + k * 1.4), 0, 7); ctx.stroke(); }
+      if (e.lvl >= 1) { ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(e.x, -e.y, e.size * (0.4 + k * 1.4), 0, 7); ctx.stroke(); }
     } else if (e.type === 'crack') {
       ctx.globalAlpha = 1 - k;
       ctx.strokeStyle = '#4a3a2a'; ctx.lineWidth = 4; ctx.lineCap = 'round';
