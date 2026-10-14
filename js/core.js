@@ -9,7 +9,7 @@
   SO.CFG = {
     FPS: 60,
     STAGE_W: 2800,
-    VIEW_W: 1500, // bề rộng khung nhìn (world px) — camera không zoom
+    VIEW_W: 1100, // bề rộng khung nhìn (world px) — camera không zoom
     SCREEN_MARGIN: 24, // khoảng cách tối thiểu từ người chơi tới mép màn hình
     CHARGE: 40, // số frame giữ để charge ([4]6, [2]8)
     CHARGE_KEEP: 10, // giữ charge thêm bao nhiêu frame sau khi nhả

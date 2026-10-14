@@ -169,7 +169,8 @@
     const scale = R.W / viewW;
     const camX = SO.clamp(mid - viewW / 2, 0, C.STAGE_W - viewW);
     const top = Math.max(a.y + a.c.h, b.y + b.c.h);
-    const offY = Math.max(0, top - 720) * 0.7;
+    // chỉ nâng camera khi nhân vật bay cao gần chạm HUD
+    const offY = Math.max(0, top - (R.GROUND - 210) * (C.VIEW_W / R.W));
     const cam = R.cam;
     if (!cam.init) { cam.x = camX; cam.scale = scale; cam.offY = offY; cam.init = true; }
     cam.x = camX;
@@ -290,16 +291,16 @@
   // ------------------------------------------------------------------ vũ khí
   // len = chiều dài lưỡi/cán (px), idle = góc cầm khi đứng yên (rad, âm = chĩa lên trước)
   R.WEAPONS = {
-    greatsword: { blade: true, len: 175, w: 30, twoHand: true, color: '#c9d1d8', idle: -1.0, grip: 30 },
-    longsword: { blade: true, len: 140, w: 17, color: '#d6dde3', idle: -1.15, grip: 22 },
-    katana: { blade: true, len: 132, w: 11, curve: 0.12, color: '#e7ecf0', idle: -1.25, grip: 26 },
-    dual_blades: { blade: true, len: 74, w: 13, dual: true, color: '#dfe5ea', idle: -0.55, grip: 14 },
-    staff: { pole: true, len: 185, color: '#8a6a45', idle: -1.42, tipKind: 'hex' },
-    stop_sign: { pole: true, len: 160, color: '#9aa1a8', idle: -1.42, tipKind: 'stop' },
-    knuckles: { gloves: true },
-    spellbook: { book: true },
-    slingshot: { sling: true },
-    marionette: { cross: true },
+    greatsword: { blade: true, len: 175, w: 30, twoHand: true, color: '#c9d1d8', idle: -1.0, grip: 30, restA: Math.PI + 0.55, rest: (bx, shY, bw, fc) => ({ front: [bx + fc * bw * 0.36, shY - 8] }) },
+    longsword: { blade: true, len: 140, w: 17, color: '#d6dde3', idle: -1.15, grip: 22, twoHand: true, restA: -0.5, rest: (bx, shY, bw, fc) => ({ front: [bx + fc * bw * 0.62, shY + 22] }) },
+    katana: { blade: true, len: 132, w: 11, curve: 0.12, color: '#e7ecf0', idle: -1.25, grip: 26, restA: 0.32, revA: 2.6, rest: (bx, shY, bw, fc, f) => (f.gim.stance === 'Arc' ? { front: [bx + fc * bw * 0.55, shY + 6], back: [bx - fc * bw * 0.1, shY - 22] } : { front: [bx + fc * bw * 0.5, shY + 34], back: [bx + fc * bw * 0.2, shY + 30] }) },
+    dual_blades: { blade: true, len: 74, w: 13, dual: true, color: '#dfe5ea', idle: -0.55, grip: 14, restA: 0.65, backA: -2.3, rest: (bx, shY, bw, fc) => ({ front: [bx + fc * bw * 0.58, shY + 26], back: [bx - fc * bw * 0.05, shY - 26] }) },
+    staff: { pole: true, len: 185, color: '#8a6a45', idle: -1.42, tipKind: 'hex', restA: -1.62, rest: (bx, shY, bw, fc) => ({ front: [bx + fc * bw * 0.62, shY + 12] }) },
+    stop_sign: { pole: true, len: 160, color: '#9aa1a8', idle: -1.42, tipKind: 'stop', restA: Math.PI + 0.95, rest: (bx, shY, bw, fc) => ({ front: [bx + fc * bw * 0.34, shY - 6], back: [bx + fc * bw * 0.05, shY + 30] }) },
+    knuckles: { gloves: true, rest: (bx, shY, bw, fc) => ({ front: [bx + fc * bw * 0.64, shY - 26], back: [bx + fc * bw * 0.3, shY - 40] }) },
+    spellbook: { book: true, rest: (bx, shY, bw, fc) => ({ back: [bx - fc * bw * 0.4, shY + 4], front: [bx + fc * bw * 0.6, shY + 6] }) },
+    slingshot: { sling: true, rest: (bx, shY, bw, fc) => ({ front: [bx + fc * bw * 0.66, shY - 8] }) },
+    marionette: { cross: true, rest: (bx, shY, bw, fc) => ({ front: [bx + fc * bw * 0.5, shY - 62] }) },
   };
 
   R.weaponPose = function (w, WP) {
@@ -313,10 +314,9 @@
     } else if (w.P.lying) ang = fc > 0 ? 0.2 : Math.PI - 0.2;
     else if (w.P.hurt) ang = fc > 0 ? 2.5 : Math.PI - 2.5;
     else {
-      let a = WP.idle || -1;
-      if (rev) a = 1.95;
+      let a = (rev ? WP.revA : WP.restA) ?? WP.idle ?? -1;
       if (w.P.guard) a = rev ? 1.6 : -1.5;
-      if (w.P.crouch && !rev) a += 0.35;
+      if (w.P.crouch && Math.abs(a) < 1.7) a += 0.3;
       if (f.state === 'attack' && f.move && !w.target) a = rev ? 1.2 : -0.35; // chiêu không có hitbox (cast, lao...)
       ang = fc > 0 ? a : Math.PI - a;
     }
@@ -364,7 +364,8 @@
     if (WP.blade) {
       if (layer === 'back' && WP.dual) {
         const h = w.back.hand;
-        const a = w.target ? wt.ang + fc * 0.5 : fc > 0 ? -0.2 : Math.PI + 0.2;
+        const ba = WP.backA ?? -0.2;
+        const a = w.target ? wt.ang + fc * 0.5 : w.P.guard ? (fc > 0 ? -1.2 : Math.PI + 1.2) : fc > 0 ? ba : Math.PI - ba;
         drawBlade(ctx, h, a, WP, metal(WP.color), ink, seed + 10);
       }
       if (layer === 'front') drawBlade(ctx, wt.base, wt.ang, WP, metal(WP.color), ink, seed);
@@ -508,6 +509,13 @@
     const front = fc > 0 ? 1 : -1;
     const frontArm = arms[front > 0 ? 1 : 0], backArm = arms[front > 0 ? 0 : 1];
     const frontLeg = legs[front > 0 ? 1 : 0], backLeg = legs[front > 0 ? 0 : 1];
+    // tư thế cầm vũ khí riêng khi đứng/đi/nhảy (không áp khi đang đánh, đỡ, bị đánh)
+    const WPr = R.WEAPONS[c.weapon];
+    if (WPr && WPr.rest && !P.guard && !P.hurt && !P.lying && f.state !== 'attack' && f.state !== 'throwing') {
+      const r = WPr.rest(bx, shY, bw, fc, f);
+      if (r.front) frontArm.hand = r.front;
+      if (r.back) backArm.hand = r.back;
+    }
     const WP = R.WEAPONS[c.weapon] || null;
     let wTarget = null, magicT = null;
     if (P.armT) {
