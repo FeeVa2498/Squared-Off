@@ -353,7 +353,7 @@
       ctx.globalAlpha = 0.85 * k;
       R.sketchEllipse(ctx, px, 560, 280, 300, 410 + p, { fill: 'rgba(255,255,255,0.55)', stroke: pf.c.color, width: 6 });
       ctx.globalAlpha = 1;
-      const sc = 2.5;
+      const sc = 2.5 * Math.min(1, 190 / pf.c.h);
       ctx.setTransform(sc, 0, 0, sc, px, 840);
       ctx.globalAlpha = k;
       if (pf.G.draw) pf.G.draw(pf, ctx, R);

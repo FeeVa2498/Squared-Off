@@ -77,6 +77,12 @@
   S.push({ name: 'Dead Angle khi block', p1: 'Circle', dist: 100, eq: 0, p1seq: ['w2', 'H'], p2seq: ['4:22', '4+LMH:3', 'w20'], frames: 60, check: (r) => r.m2.includes('ALL_DEAD_ANGLE') });
   S.push({ name: 'FD giảm Equilibrium', p1: 'Circle', dist: 100, eq: 0, p1seq: ['w2', 'H'], p2seq: ['4:20', '4+LM:30'], frames: 40, check: (r, W) => r.p2.includes('block') && W.eq > 0 });
   S.push({ name: 'Instant block', p1: 'Circle', dist: 100, p1seq: ['w2', 'H'], p2seq: ['w12', '4:30'], frames: 40, extra: (W) => W.fx.map((e) => e.text).filter(Boolean) });
+  S.push({ name: 'Octagon charge [4]6L', p1: 'Octagon', dist: 500, p1seq: ['4:45', '6L'], frames: 70, check: (r) => r.m1.includes('OC_C46L') });
+  S.push({ name: 'Octagon chưa đủ charge thì không ra', p1: 'Octagon', dist: 500, p1seq: ['4:15', '6L'], frames: 40, check: (r) => !r.m1.includes('OC_C46L') });
+  S.push({ name: 'Octagon charge [2]8H', p1: 'Octagon', p2: 'Circle', dist: 140, p1seq: ['2:45', '8H'], frames: 60, check: (r) => r.m1.includes('OC_C28H') && !r.p1.includes('air') });
+  S.push({ name: 'Rhombus [4]6H Diamond Charge', p1: 'Rhombus', dist: 230, p1seq: ['4:45', '6H'], frames: 70, check: (r) => r.m1.includes('RH_C46H') && r.dmg[1] > 0 });
+  S.push({ name: 'Rhombus không dash được', p1: 'Rhombus', dist: 600, p1seq: ['6:2', 'w2', '6:20'], frames: 30, check: (r) => !r.p1.includes('dash') });
+  S.push({ name: 'Mép màn hình chặn lùi', p1: 'Circle', dist: 300, p1seq: ['4:240'], frames: 240, check: (r, W, a, b) => Math.abs(b.x - a.x) <= SO.CFG.VIEW_W - a.c.w / 2 - b.c.w / 2 - SO.CFG.SCREEN_MARGIN * 2 + 1 && b.x > a.x });
   S.push({ name: 'Dash 66', p1: 'Circle', dist: 600, p1seq: ['6:2', 'w2', '6:20'], frames: 30, check: (r) => r.p1.includes('dash') });
   S.push({ name: 'Backdash 44', p1: 'Circle', dist: 300, p1seq: ['4:2', 'w2', '4:2'], frames: 30, check: (r) => r.p1.includes('backdash') });
   S.push({ name: 'Super jump 2>8 + không double jump', p1: 'Square', dist: 600, p1seq: ['2:3', '8:3', 'w10', '8:3'], frames: 30, check: (r, W, a) => a.superJump && a.airJumps === 0 });
@@ -91,7 +97,10 @@
   S.push({ name: 'Circle install -> special tăng cường', p1: 'Circle', dist: 120, p1seq: ['236L', 'w14', 'U', 'w8', '214M'], frames: 120, check: (r, W, a) => r.m1.includes('CR_U_INSTALL') && r.m1.includes('CR_214M'), extra: (W, a) => ({ inst: a.gim.install }) });
   S.push({ name: 'Square ring tăng tốc projectile', p1: 'Square', dist: 900, p1seq: ['U', 'w26', '236L'], frames: 90, each: (W, a, b, fr, ev) => { if (W.projs.some((p) => p.boosted)) ev.boost = true; }, check: (r, W, a, b, ev) => ev.boost });
   S.push({ name: 'Triangle apex dash rồi j.H', p1: 'Triangle', dist: 400, p1seq: ['U', 'w10', 'H'], frames: 50, check: (r) => r.m1.includes('TR_5U') && r.m1.includes('TR_jH') });
-  S.push({ name: 'Triangle teleport ra sau', p1: 'Triangle', dist: 300, p1seq: ['214L'], frames: 40, check: (r, W, a, b) => a.x > b.x });
+  S.push({ name: 'Triangle 214L side swap khi ở gần', p1: 'Triangle', dist: 130, p1seq: ['214L'], frames: 40, check: (r, W, a, b) => a.x > b.x });
+  S.push({ name: 'Triangle 214L ở xa không qua người', p1: 'Triangle', dist: 700, p1seq: ['214L'], frames: 40, check: (r, W, a, b) => a.x < b.x && r.m1.includes('TR_214L') });
+  S.push({ name: 'Triangle 214L cancel sang 5H', p1: 'Triangle', dist: 600, p1seq: ['214L', 'w4', 'H'], frames: 50, check: (r) => r.m1.includes('TR_5H') });
+  S.push({ name: 'Triangle disc chưa gây sát thương trước 30f', p1: 'Triangle', dist: 200, p1seq: ['236L'], frames: 50, each: (W, a, b, fr, ev) => { const p = W.projs.find((q) => q.kind === 'disc'); if (p && p.t < 30 && b.state === 'hitstun') ev.early = true; if (p && b.combo.hits > 0) ev.hit = true; }, check: (r, W, a, b, ev) => !ev.early });
   S.push({ name: 'Rhombus command grab 63214H', p1: 'Rhombus', dist: 120, p1seq: ['63214H'], frames: 90, check: (r) => r.p2.includes('thrown') && r.dmg[1] >= 140 });
   S.push({ name: 'Rhombus grip shift armor', p1: 'Rhombus', p2: 'Circle', dist: 140, p1seq: ['U', 'w10', 'H'], p2seq: ['w18', 'L'], frames: 50, extra: (W) => W.fx.map((e) => e.text).filter(Boolean), check: (r) => r.m1.includes('RH_5H') });
   S.push({ name: 'Hexagon node + detonate', p1: 'Hexagon', dist: 300, p1seq: ['2U', 'w26', '236L'], frames: 80, check: (r) => r.dmg[1] > 0 });
@@ -104,7 +113,8 @@
   S.push({ name: 'Semicircle đổi thế giữa đòn', p1: 'Semicircle', dist: 100, p1seq: ['H', 'w4', 'U'], frames: 40, check: (r, W, a) => a.gim.stance === 'Arc' && r.m1.includes('SC_5H') && r.m1.length === 1 });
   S.push({ name: 'Semicircle Arc 214M khác Flat 214M', p1: 'Semicircle', dist: 120, setup: (W, a) => { a.gim.stance = 'Arc'; }, p1seq: ['214M'], frames: 60, check: (r) => r.m1.includes('SC_A_214M') });
   S.push({ name: 'Semicircle Flat auto-guard counter', p1: 'Semicircle', p2: 'Circle', dist: 110, p1seq: ['214M'], p2seq: ['w8', 'H'], frames: 70, check: (r) => r.m1.includes('SC_F_GUARD_SLASH') });
-  S.push({ name: 'Star nạp nguyên tố khi trúng và cast FFI', p1: 'Star', dist: 100, p1seq: ['L', 'w14', 'L', 'w14', 'M', 'w20', 'U'], frames: 120, check: (r) => r.m1.includes('ST_SP_FFI') });
+  S.push({ name: 'Star L=Băng M=Điện: cast IIL', p1: 'Star', dist: 100, p1seq: ['L', 'w14', '4L', 'w14', 'M', 'w20', 'U'], frames: 120, check: (r) => r.m1.includes('ST_SP_IIL') });
+  S.push({ name: 'Star 4L / 6H / 2M đúng chiêu', p1: 'Star', dist: 120, p1seq: ['4L', 'w16', '6H', 'w40', '2M'], frames: 110, check: (r) => r.m1.includes('ST_4L') && r.m1.includes('ST_6H') && r.m1.includes('ST_2M') });
   S.push({ name: 'Star không nạp khi đánh trượt', p1: 'Star', dist: 600, p1seq: ['L', 'w14', 'U'], frames: 50, check: (r, W, a) => !r.m1.some((m) => m.startsWith('ST_SP')) });
   S.push({ name: 'Star nạp khi bị block', p1: 'Star', dist: 100, block: 'all', p1seq: ['L', 'w14'], frames: 30, check: (r, W, a) => a.gim.el.length === 1 });
   S.push({ name: 'Star stock 214U rồi cast stock', p1: 'Star', dist: 120, setup: (W, a) => { a.gim.el = ['L', 'L']; }, p1seq: ['214U', 'w30', 'U'], frames: 90, check: (r, W, a) => r.m1.includes('ST_214U') && r.m1.includes('ST_SP_LL') && a.gim.stock === null });

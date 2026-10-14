@@ -130,8 +130,8 @@ ORIG_EXTRA = {
                     props_add='Vel=3:17@5-10'),
     'TR_3H': dict(name='Tri Sweep', type='Command', hb=(112, 14, 128, 24)),
     'TR_2H': dict(name='Apex Launcher', type='Normal', hb=(54, 175, 80, 130), unt=42),
-    'TR_236L': dict(name='Disc', type='Special', hb=(60, 16, 72, 26), spd=2.5, hits=3,
-                    props_add='Proj=disc'),
+    'TR_236L': dict(name='Disc', type='Special', hb=(60, 16, 72, 26), spd=6, hits=3,
+                    props_add='Proj=disc|Arm=30|Friction=0.9'),
     'ST_5L': dict(name='Ember Flick', type='Normal', hb=(64, 128, 58, 30), props_add='Element=F'),
     'ST_5M': dict(name='Frost Breath', type='Normal', hb=(92, 120, 86, 40), props_add='Element=I'),
     'ST_5H': dict(name='Volt Pillar', type='Normal', hb=(80, 150, 90, 110), unt=40,
@@ -188,7 +188,7 @@ NORMAL_TEMPLATE = {
 }
 
 
-def normals(ch, pfx, skip=(), speed=0, dmg=1.0, reach=1.0, over=None, extra_props=None):
+def normals(ch, pfx, skip=(), speed=0, dmg=1.0, reach=1.0, over=None, extra_props=None, yscale=1.0):
     over = over or {}
     extra_props = extra_props or {}
     for inp, base in NORMAL_TEMPLATE.items():
@@ -202,7 +202,7 @@ def normals(ch, pfx, skip=(), speed=0, dmg=1.0, reach=1.0, over=None, extra_prop
         x, y, w, h = kw.pop('hb')
         kw['su'] = max(3, kw['su'] + speed)
         kw['dmg'] = int(round(kw['dmg'] * dmg))
-        hb = (round(x * reach), y, round(w * reach), h)
+        hb = (round(x * reach), round(y * yscale), round(w * reach), round(h * yscale))
         if inp in over:
             o = dict(over[inp])
             if 'hb' in o:
@@ -219,18 +219,18 @@ def normals(ch, pfx, skip=(), speed=0, dmg=1.0, reach=1.0, over=None, extra_prop
 CHAR_COLS = ['Character', 'Prefix', 'Shape', 'Archetype', 'HP', 'Walk_Fwd', 'Walk_Back', 'Dash_Speed',
              'Backdash_Frames', 'Jump_Velocity', 'Jump_Fwd_Speed', 'Gravity', 'Airdash_Speed',
              'Airdash_Frames', 'Air_Jumps', 'Air_Dashes', 'Width', 'Height', 'Throw_Range', 'Color',
-             'Gimmick']
+             'Weapon', 'Gimmick']
 CHARS = [
-    ['Circle', 'CR', 'circle', 'Rushdown', 950, 4.6, 3.6, 11.0, 20, 19.0, 5.6, 0.95, 15, 16, 1, 1, 110, 168, 150, '#e0574a', 'Rolling Install: press U right after a special (costs 10%) to boost the next special: +1 hit, +20% damage, 2f faster (3 seconds). 5U rolls forward, 2U rolls back, j.U is a diving roll.'],
-    ['Square', 'SQ', 'square', 'Shoto / Balanced', 1000, 4.0, 3.3, 10.0, 22, 19.0, 5.0, 0.95, 14, 15, 1, 1, 118, 186, 150, '#3f7fd8', 'Prism Ring: 5U places a mid ring, 2U a low ring, j.U an angled ring. Your projectiles passing through it gain 1.5x speed, 1.5x size and +1 hit. One ring at a time, lasts 4s, 3s cooldown.'],
-    ['Triangle', 'TR', 'triangle', 'Vortex / Mobility', 900, 4.4, 3.6, 11.5, 20, 19.5, 5.8, 0.95, 16, 14, 1, 2, 108, 196, 145, '#f2a516', 'Apex Dash: 5U dashes diagonally up-forward, 2U up-back, j.U down-forward (can attack after 6f). 236L leaves a disc on the floor for okizeme.'],
-    ['Rhombus', 'RH', 'rhombus', 'Grappler', 1150, 3.0, 2.6, 8.0, 24, 17.5, 4.2, 1.0, 0, 0, 1, 0, 140, 214, 165, '#8a5ac8', 'Grip Shift: 5U armors mid/high hits, 2U armors low/mid hits (90f, every normal gets 1 armor hit, walks slower). j.U is an armored dive. 63214H command grab.'],
-    ['Hexagon', 'HX', 'hexagon', 'Trap', 950, 3.8, 3.2, 9.5, 22, 18.5, 4.8, 0.95, 14, 14, 1, 1, 118, 186, 150, '#2fa37a', 'Grid Node: 5U places a node at your position, 2U on the floor 300px ahead, j.U in the air. Up to 3 nodes. 236L/M/H detonates node 1/2/3; with 2+ nodes a laser links them.'],
-    ['Oval', 'OV', 'oval', 'Zoner', 950, 3.7, 3.3, 9.5, 22, 18.5, 4.6, 0.95, 14, 14, 1, 1, 98, 206, 150, '#d65ba3', 'Elastic Stretch: U toggles stretch for 5s. Normals reach 1.6x farther with +3f recovery, and the hurtbox stretches too. 8s cooldown.'],
-    ['Cone & Cyl', 'CC', 'cone', 'Puppet', 950, 4.0, 3.3, 10.0, 22, 18.5, 5.0, 0.95, 14, 14, 1, 1, 100, 188, 150, '#d2683a', 'Puppet: hold U + direction to move Cylinder, hold U + L/M/H to make Cylinder attack, 2U recalls it, j.U makes it jump and strike. If Cylinder gets hit it is stunned for 3s.'],
-    ['Octagon', 'OC', 'octagon', 'Parry', 1000, 4.0, 3.3, 10.0, 22, 19.0, 5.0, 0.95, 14, 14, 1, 1, 118, 186, 150, '#c93a3a', 'STOP Parry: 5U parries high/mid, 2U parries low/mid, j.U parries in the air. 7f window; a successful parry stuns the attacker for 30f. Cannot parry throws or supers.'],
-    ['Semicircle', 'SC', 'semicircle', 'Stance', 980, 4.2, 3.4, 10.5, 20, 19.0, 5.2, 0.95, 15, 15, 1, 1, 128, 170, 150, '#4aa3d9', 'Stance (Narmaya style): U switches stance instantly, even mid-attack. Flat (blue): +20% reach, H normals get armor. Arc (pink): 1f faster startup, normals dash cancel, faster walk. Each stance has its own 4 specials.'],
-    ['Star', 'ST', 'star', 'Element Mage', 900, 3.8, 3.2, 9.5, 22, 18.5, 4.8, 0.95, 14, 14, 1, 1, 118, 186, 145, '#e8c228', 'Elements (Nine style): normals L=Fire, M=Ice, H=Lightning, gained on hit or block, up to 3. U casts a spell based on HOW MANY of each element you hold (19 spells). 214U stocks the spell; U with empty slots casts the stock.'],
+    ['Circle', 'CR', 'circle', 'Rushdown', 950, 4.6, 3.6, 11.0, 20, 19.0, 5.6, 0.95, 15, 16, 1, 1, 110, 168, 150, '#e0574a', 'greatsword', 'Rolling Install: press U right after a special (costs 10%) to boost the next special: +1 hit, +20% damage, 2f faster (3 seconds). 5U rolls forward, 2U rolls back, j.U is a diving roll.'],
+    ['Square', 'SQ', 'square', 'Shoto / Balanced', 1000, 4.0, 3.3, 10.0, 22, 19.0, 5.0, 0.95, 14, 15, 1, 1, 118, 186, 150, '#3f7fd8', 'longsword', 'Prism Ring: 5U places a mid ring, 2U a low ring, j.U an angled ring. Your projectiles passing through it gain 1.5x speed, 1.5x size and +1 hit. One ring at a time, lasts 4s, 3s cooldown.'],
+    ['Triangle', 'TR', 'triangle', 'Vortex / Mobility', 900, 4.4, 3.6, 11.5, 20, 19.5, 5.8, 0.95, 16, 14, 1, 2, 108, 196, 145, '#f2a516', 'dual_blades', 'Apex Dash: 5U dashes diagonally up-forward, 2U up-back, j.U down-forward (can attack after 6f). 236L drops a disc that arms after 30f, made for okizeme. 214L Apex Lunge: a fast dash you can cancel into any attack for range; up close it crosses through for a side swap.'],
+    ['Rhombus', 'RH', 'rhombus', 'Grappler', 1200, 2.8, 2.4, 0, 26, 17.0, 4.0, 1.0, 0, 0, 1, 0, 172, 252, 180, '#8a5ac8', 'knuckles', 'Big grappler that cannot run. Grip Shift: 5U armors mid/high hits, 2U armors low/mid hits (90f, normals get 1 armor hit). [4]6H Diamond Charge: armored rush to close the gap. j.U armored dive. 63214H command grab.'],
+    ['Hexagon', 'HX', 'hexagon', 'Trap', 950, 3.8, 3.2, 9.5, 22, 18.5, 4.8, 0.95, 14, 14, 1, 1, 118, 186, 150, '#2fa37a', 'staff', 'Grid Node: 5U places a node at your position, 2U on the floor 300px ahead, j.U in the air. Up to 3 nodes. 236L/M/H detonates node 1/2/3; with 2+ nodes a laser links them.'],
+    ['Oval', 'OV', 'oval', 'Zoner', 950, 3.7, 3.3, 9.5, 22, 18.5, 4.6, 0.95, 14, 14, 1, 1, 98, 206, 150, '#d65ba3', 'slingshot', 'Elastic Stretch: U toggles stretch for 5s. Normals reach 1.6x farther with +3f recovery, and the hurtbox stretches too. 8s cooldown.'],
+    ['Cone & Cyl', 'CC', 'cone', 'Puppet', 950, 4.0, 3.3, 10.0, 22, 18.5, 5.0, 0.95, 14, 14, 1, 1, 100, 188, 150, '#d2683a', 'marionette', 'Puppet: hold U + direction to move Cylinder, hold U + L/M/H to make Cylinder attack, 2U recalls it, j.U makes it jump and strike. If Cylinder gets hit it is stunned for 3s.'],
+    ['Octagon', 'OC', 'octagon', 'Parry', 1000, 4.0, 3.3, 10.0, 22, 19.0, 5.0, 0.95, 14, 14, 1, 1, 118, 186, 150, '#c93a3a', 'stop_sign', 'Charge character. [4]6L/M Stop Sign projectile, [2]8H Octa Rise anti-air. STOP Parry: 5U high/mid, 2U low/mid, j.U in the air; 7f window, stuns the attacker for 30f. Cannot parry throws or supers.'],
+    ['Semicircle', 'SC', 'semicircle', 'Stance', 980, 4.2, 3.4, 10.5, 20, 19.0, 5.2, 0.95, 15, 15, 1, 1, 128, 170, 150, '#4aa3d9', 'katana', 'Stance (Narmaya style): U switches stance instantly, even mid-attack. Flat (blue): +20% reach, H normals get armor. Arc (pink): 1f faster startup, normals dash cancel, faster walk. Each stance has its own 4 specials.'],
+    ['Star', 'ST', 'star', 'Element Mage', 900, 3.8, 3.2, 9.5, 22, 18.5, 4.8, 0.95, 14, 14, 1, 1, 118, 186, 145, '#e8c228', 'spellbook', 'Elements (Nine style): L=Ice, M=Lightning, H=Fire, gained on hit or block, up to 3. 4X close jabs, 5X long-range pokes, 2X lows, 6X anti-airs (near/45°/far). U casts a spell based on HOW MANY of each element you hold. 214U stocks a spell.'],
 ]
 
 
@@ -264,8 +264,7 @@ def build():
 
     # ===================== TRIANGLE =====================
     normals('Triangle', 'TR', speed=-1, dmg=0.92, reach=1.05, over={'6M': dict(name='Apex Overhead')})
-    add('TR_214L', 'Triangle', '214L', type='Special', name='Tri-Shift (Behind)', su=1, act=0, rec=22, oh=0, ob=0, inv='Full', invf='6-16', props='Teleport=behind@14|Vanish=6-14')
-    add('TR_214M', 'Triangle', '214M', type='Special', name='Tri-Shift (Front)', su=1, act=0, rec=20, oh=0, ob=0, inv='Full', invf='6-14', props='Teleport=front@12|Vanish=6-12')
+    add('TR_214L', 'Triangle', '214L', type='Special', name='Apex Lunge', su=4, act=0, rec=24, oh=0, ob=0, props='Vel=15:0@4-19;4:0@20-24|PassThrough|FreeCancel=7')
     add('TR_623H', 'Triangle', '623H', type='Special', name='Apex Slash', dmg=90, chip=15, su=7, act=6, rec=28, ob=-20, oh=0, hits=2, kbx=3, kby=10, kbt='Knockdown', inv='Full', invf='1-7', props='Vel=3:18@7-12', hb=(48, 165, 80, 140))
     add('TR_j214H', 'Triangle', 'j.214H', type='Special', name='Spike Dive', dmg=55, chip=6, su=10, act=20, rec=10, ob=-2, oh=3, blk='High', unt=22, kbx=2, props='Vel=7:-16@10-29|LandEnd', hb=(24, 30, 80, 90))
     add('TR_236236H', 'Triangle', '236236H', type='Super', name='Trinity Rush', dmg=230, chip=35, su=8, act=25, rec=30, ob=-20, oh=0, hits=6, kbx=4, kby=10, kbt='Hard_Knockdown', inv='Full', invf='1-10', props='Vel=13:0@8-20|NoExtHurt', hb=(46, 110, 120, 150))
@@ -275,10 +274,11 @@ def build():
     add('TR_jU', 'Triangle', 'j.U', type='Unique', name='Apex Dash (Down-Fwd)', su=1, act=0, rec=14, oh=0, ob=0, air=True, props='Vel=10:-10@1-14|AirCancel=6|LandEnd|Script=apex')
 
     # ===================== RHOMBUS =====================
-    normals('Rhombus', 'RH', speed=1, dmg=1.15, reach=1.1, over={'5L': dict(su=6), '6M': dict(name='Heavy Drop', arm=1)})
+    normals('Rhombus', 'RH', speed=1, dmg=1.15, reach=1.3, yscale=1.25, over={'5L': dict(su=6), '6M': dict(name='Heavy Drop', arm=1)})
     add('RH_THROW', 'Rhombus', 'LM', type='Throw', name='Rhombus Throw', dmg=110, su=5, act=2, rec=24, oh=0, ob=0, kbx=3, kby=7, kbt='Knockdown', blk='Unblockable', props='Grab=24|BreakWindow=12')
     add('RH_63214H', 'Rhombus', '63214H', type='CmdGrab', name='Diamond Grip', dmg=150, su=5, act=3, rec=40, oh=0, ob=0, kbx=2, kby=8, kbt='Hard_Knockdown', blk='Unblockable', props='Grab=40', hb=(84, 110, 80, 160))
-    add('RH_236H', 'Rhombus', '236H', type='Special', name='Shoulder Charge', dmg=80, chip=12, su=18, act=8, rec=22, ob=-4, oh=0, kbx=4, kby=3, kbt='Knockdown', arm=1, props='Vel=10:0@10-25', hb=(70, 120, 90, 120))
+    add('RH_C46H', 'Rhombus', '[4]6H', type='Special', name='Diamond Charge', dmg=85, chip=12, su=14, act=20, rec=20, ob=-4, oh=0, kbx=4, kby=4, kbt='Knockdown', arm=1, props='Vel=13:0@8-33', hb=(80, 150, 100, 160))
+    add('RH_C46L', 'Rhombus', '[4]6L', type='Special', name='Diamond Step', dmg=50, chip=8, su=10, act=12, rec=16, ob=-2, oh=2, kbx=3, arm=1, props='Vel=11:0@6-21', hb=(80, 150, 100, 160))
     add('RH_214M', 'Rhombus', '214M', type='Special', name='Rhomb Lariat', dmg=70, chip=10, su=10, act=10, rec=24, ob=-10, oh=0, hits=2, kbx=2, kby=11, kbt='Launch', unt=34, hb=(70, 160, 130, 100))
     add('RH_623H', 'Rhombus', '623H', type='AirGrab', name='Sky Grip', dmg=120, su=6, act=6, rec=36, oh=0, ob=0, kbx=2, kby=6, kbt='Hard_Knockdown', blk='Unblockable', props='Vel=2:14@6-12|Grab=30', hb=(60, 200, 96, 130))
     add('RH_236236H', 'Rhombus', '236236H', type='Super', name='Diamond Crush', dmg=260, chip=40, su=10, act=12, rec=34, ob=-16, oh=0, hits=3, kbx=5, kby=10, kbt='Hard_Knockdown', arm=99, inv='Throw', invf='1-22', props='Vel=10:0@10-21', hb=(70, 120, 120, 160))
@@ -328,9 +328,9 @@ def build():
 
     # ===================== OCTAGON =====================
     normals('Octagon', 'OC')
-    add('OC_236L', 'Octagon', '236L', type='Special', name='Stop Sign (Slow)', dmg=45, chip=9, su=14, act=70, rec=18, ob=-2, oh=1, kbx=3, spd=7, props='Proj=straight', hb=(70, 120, 64, 64))
-    add('OC_236M', 'Octagon', '236M', type='Special', name='Stop Sign (Fast)', dmg=50, chip=10, su=15, act=50, rec=19, ob=-3, oh=1, kbx=3, spd=11, props='Proj=straight', hb=(70, 120, 64, 64))
-    add('OC_623H', 'Octagon', '623H', type='Special', name='Octa Rise', dmg=95, chip=16, su=8, act=7, rec=30, ob=-22, oh=0, hits=2, kbx=3, kby=11, kbt='Knockdown', inv='Full', invf='1-8', props='Vel=2:17@8-14', hb=(48, 165, 82, 140))
+    add('OC_C46L', 'Octagon', '[4]6L', type='Special', name='Stop Sign (Slow)', dmg=45, chip=9, su=14, act=70, rec=18, ob=-2, oh=1, kbx=3, spd=7, props='Proj=straight', hb=(70, 120, 64, 64))
+    add('OC_C46M', 'Octagon', '[4]6M', type='Special', name='Stop Sign (Fast)', dmg=50, chip=10, su=15, act=50, rec=19, ob=-3, oh=1, kbx=3, spd=11, props='Proj=straight', hb=(70, 120, 64, 64))
+    add('OC_C28H', 'Octagon', '[2]8H', type='Special', name='Octa Rise', dmg=95, chip=16, su=8, act=7, rec=30, ob=-22, oh=0, hits=2, kbx=3, kby=11, kbt='Knockdown', inv='Full', invf='1-8', props='Vel=2:17@8-14', hb=(48, 165, 82, 140))
     add('OC_214H', 'Octagon', '214H', type='Special', name='Octa Counter', su=4, act=21, rec=20, oh=0, ob=0, props='AutoGuard=4-24|Followup=OC_COUNTER_HIT')
     add('OC_COUNTER_HIT', 'Octagon', '-', type='Followup', name='Octa Counter Strike', dmg=90, su=4, act=4, rec=20, ob=-10, oh=0, kbx=4, kby=6, kbt='Knockdown', inv='Full', invf='1-8', hb=(80, 120, 110, 120))
     add('OC_236236H', 'Octagon', '236236H', type='Super', name='Full Stop', dmg=160, chip=30, su=12, act=80, rec=28, ob=-4, oh=70, kbx=1, spd=9, inv='Full', invf='1-12', props='Proj=straight', hb=(80, 120, 110, 110))
@@ -355,9 +355,33 @@ def build():
     add('SC_U', 'Semicircle', 'U / 2U / j.U', type='Unique', name='Stance Switch', su=0, act=0, rec=0, oh=0, ob=0, props='Script=stance|FlatReach=1.2|ArcFaster=1|ArcWalk=1.25|FlatWalk=0.85')
 
     # ===================== STAR =====================
-    normals('Star', 'ST', skip=('6M', '3H'), extra_props={
-        '2L': 'Element=F', '2M': 'Element=I', '2H': 'Element=L',
-        'j.L': 'Element=F', 'j.M': 'Element=I', 'j.H': 'Element=L'})
+    # L = Ice (I), M = Lightning (L), H = Fire (F)
+    for mid in ('ST_5L', 'ST_5M', 'ST_5H'):
+        ROWS[:] = [r for r in ROWS if r['Move_ID'] != mid]
+        IDS.discard(mid)
+    E = {'L': 'I', 'M': 'L', 'H': 'F'}
+    star = [
+        # input, name, dmg, su, act, rec, ob, oh, blk, kbt, kbx, kby, unt, hb
+        ('4L', 'Frost Jab', 10, 4, 3, 7, 1, 3, 'Mid', 'Normal', 1.2, 0, 0, (55, 125, 52, 30)),
+        ('4M', 'Spark Jab', 22, 6, 3, 10, 0, 3, 'Mid', 'Normal', 1.8, 0, 0, (62, 115, 62, 40)),
+        ('4H', 'Flame Palm', 45, 10, 4, 16, -3, 2, 'Mid', 'Normal', 2.6, 0, 0, (68, 130, 82, 70)),
+        ('5L', 'Icicle Reach', 18, 8, 4, 12, -2, 1, 'Mid', 'Normal', 1.6, 0, 0, (150, 120, 150, 30)),
+        ('5M', 'Arc Bolt', 30, 11, 4, 15, -3, 1, 'Mid', 'Normal', 2.2, 0, 0, (205, 125, 190, 34)),
+        ('5H', 'Flame Lance', 50, 15, 5, 20, -5, 1, 'Mid', 'Normal', 3.0, 0, 0, (255, 130, 210, 60)),
+        ('2L', 'Frost Creep', 10, 5, 3, 8, -1, 1, 'Low', 'Normal', 1.4, 0, 0, (72, 18, 72, 24)),
+        ('2M', 'Ground Current', 24, 8, 4, 13, -3, 0, 'Low', 'Normal', 2.0, 0, 0, (145, 20, 165, 26)),
+        ('2H', 'Lava Sweep', 45, 11, 4, 22, -8, 0, 'Low', 'Knockdown', 2.0, 0, 0, (155, 18, 185, 30)),
+        ('6L', 'Ice Spire (near)', 30, 7, 4, 16, -5, 0, 'Mid', 'Launch', 1.0, 9, 30, (35, 225, 75, 120)),
+        ('6M', 'Thunder Arc (45°)', 38, 9, 4, 18, -6, 0, 'Mid', 'Launch', 1.5, 10, 32, (125, 205, 95, 95)),
+        ('6H', 'Fire Comet (far)', 50, 12, 5, 20, -8, 0, 'Mid', 'Launch', 2.0, 9, 34, (215, 175, 115, 85)),
+        ('j.L', 'Air Frost', 9, 5, 4, 8, 2, 4, 'High', 'Normal', 1.2, 0, 16, (58, 70, 58, 40)),
+        ('j.M', 'Air Spark', 24, 7, 5, 12, 2, 4, 'High', 'Normal', 1.8, 0, 18, (74, 46, 84, 50)),
+        ('j.H', 'Air Flame', 45, 10, 5, 18, 3, 6, 'High', 'Normal', 2.4, 2, 22, (70, 22, 104, 62)),
+    ]
+    for inp, nm, dmg, su, act, rec, ob, oh, blk, kbt, kbx, kby, unt, hb in star:
+        btn = inp[-1]
+        typ = 'Command' if inp[0] in '46' else 'Normal'
+        add('ST_' + inp.replace('.', ''), 'Star', inp, type=typ, name=nm, dmg=dmg, su=su, act=act, rec=rec, ob=ob, oh=oh, blk=blk, kbt=kbt, kbx=kbx, kby=kby, unt=unt, pr=0.85 if btn == 'L' else 0.9, jc=inp[0] == '6', props='Element=' + E[btn], hb=hb)
     add('ST_214L', 'Star', '214L', type='Special', name='Blink Back', su=1, act=0, rec=18, oh=0, ob=0, inv='Full', invf='4-10', props='Teleport=back:280@8|Vanish=4-8')
     add('ST_214M', 'Star', '214M', type='Special', name='Blink Forward', su=1, act=0, rec=20, oh=0, ob=0, inv='Full', invf='4-10', props='Teleport=fwd:280@8|Vanish=4-8')
     add('ST_214U', 'Star', '214U', type='Unique', name='Stock Spell', su=10, act=0, rec=10, oh=0, ob=0, props='Script=stock')
@@ -406,8 +430,8 @@ FX = {
     'SQ_5H': 'heavy', 'SQ_236L': 'prism', 'SQ_236M': 'prism', 'SQ_236H': 'prism', 'SQ_j236L': 'prism',
     'SQ_623M': 'fire', 'SQ_623H': 'fire,heavy', 'SQ_214M': 'wind,spin', 'SQ_236236H': 'prism', 'SQ_214214H': 'prism,heavy', 'SQ_3H': 'dust',
     'TR_236L': 'spark', 'TR_623H': 'slash', 'TR_j214H': 'wind', 'TR_236236H': 'slash', 'TR_214214H': 'spark',
-    'TR_3H': 'dust', 'TR_214L': 'smoke', 'TR_214M': 'smoke', 'TR_2H': 'slash',
-    'RH_5H': 'heavy', 'RH_236H': 'heavy,dust', 'RH_214M': 'wind,spin', 'RH_63214H': 'heavy', 'RH_623H': 'wind',
+    'TR_3H': 'dust', 'TR_214L': 'wind,dust', 'TR_2H': 'slash',
+    'RH_5H': 'heavy', 'RH_C46H': 'heavy,dust,wind', 'RH_C46L': 'heavy,dust', 'RH_214M': 'wind,spin', 'RH_63214H': 'heavy', 'RH_623H': 'wind',
     'RH_236236H': 'heavy,quake', 'RH_214214H': 'quake', 'RH_jU': 'quake', 'RH_6M': 'heavy', 'RH_THROW': 'heavy',
     'HX_236L': 'elec:#3fd69a', 'HX_236M': 'elec:#3fd69a', 'HX_236H': 'elec:#3fd69a', 'HX_214L': 'elec:#3fd69a',
     'HX_41236H': 'elec:#3fd69a', 'HX_236236H': 'elec:#3fd69a,heavy', 'HX_5H': 'heavy',
@@ -415,7 +439,7 @@ FX = {
     'OV_41236H': 'stretch', 'OV_236236H': 'stretch,heavy', 'OV_214214H': 'bounce',
     'CC_236L': 'spin', 'CC_623M': 'spark', 'CC_CYL_L': 'metal', 'CC_CYL_M': 'metal', 'CC_CYL_H': 'metal,heavy',
     'CC_CYL_RUSH': 'metal,dust', 'CC_jU': 'metal', 'CC_236236H': 'metal,spin', 'CC_214214H': 'heavy,quake',
-    'OC_236L': 'stop', 'OC_236M': 'stop', 'OC_623H': 'fire', 'OC_COUNTER_HIT': 'heavy', 'OC_236236H': 'stop', 'OC_214214H': 'slash',
+    'OC_C46L': 'stop', 'OC_C46M': 'stop', 'OC_C28H': 'fire', 'OC_COUNTER_HIT': 'heavy', 'OC_236236H': 'stop', 'OC_214214H': 'slash',
     'SC_F_236L': 'slash:#4aa3d9', 'SC_F_GUARD_SLASH': 'slash:#4aa3d9', 'SC_F_623H': 'slash:#4aa3d9,wind', 'SC_F_41236H': 'slash:#4aa3d9,heavy',
     'SC_A_236L': 'petal,slash:#ef6fae', 'SC_A_214M': 'petal,slash:#ef6fae', 'SC_A_623M': 'petal,slash:#ef6fae', 'SC_A_63214H': 'petal,slash:#ef6fae',
     'SC_236236H': 'slash:#4aa3d9,heavy', 'SC_214214H': 'petal,slash:#ef6fae', 'SC_5H': 'slash', 'SC_2H': 'slash',

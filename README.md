@@ -29,6 +29,8 @@ Tay cầm: X = L, Y = M, B = H, A = U, Start = Pause.
 - **Instant Block:** bấm lùi trong vòng 8f trước khi đòn chạm. Blockstun giảm 2f, Equilibrium được kéo về phía mình.
 - **Di chuyển:** Dash 66, Backdash 44, Super jump 2 rồi 7/8/9, double jump, airdash 66/44 trên không, IAD 956 (tiến) / 754 (lùi). IAD phải nhả về neutral giữa hai lần bấm, nên nhảy tới mà giữ 6 sẽ không thành IAD.
 - **Super:** 236236 + nút hoặc 214214 + nút, tốn 50%.
+- **Charge:** `[4]6` là giữ lùi 40f rồi bấm tới + nút; `[2]8` là giữ xuống 40f rồi bấm lên + nút. Sau khi nhả vẫn còn giữ charge thêm 10f. Rhombus và Octagon dùng lệnh charge.
+- **Camera:** zoom cố định như game đối kháng 2D thông thường. Hai người chơi không thể lùi ra ngoài mép màn hình; mép sân là góc (tường).
 
 ## Equilibrium (thanh kéo co)
 
@@ -95,14 +97,18 @@ Các tag ngăn cách bằng dấu `|`. Tag dạng `Key=Value` có tác dụng tr
 |---|---|---|---|
 | Circle | Ngay sau special: Rolling Install. Khi tự do: lăn tới | Lăn lùi | Lăn bổ nhào |
 | Square | Vòng Prism giữa | Vòng sát đất | Vòng nghiêng xuống |
-| Triangle | Apex chéo lên trước | Apex chéo lên sau | Apex chéo xuống |
+| Triangle | Apex chéo lên trước | Apex chéo lên sau | Apex chéo xuống. 214L lao tới, cancel được sang chiêu khác, side swap khi ở gần. Đĩa 236L có độ trễ 30f mới gây sát thương |
 | Rhombus | Grip Shift (armor mid/high) | Grip Shift (armor low/mid) | Bổ nhào có armor |
 | Hexagon | Node tại chỗ | Node trên sàn, cách 300px | Node trên không |
 | Oval | Bật/tắt Stretch | như 5U | như 5U |
 | Cone & Cyl | Giữ U + hướng để điều khiển Cylinder, giữ U + L/M/H để Cylinder đánh | Gọi Cylinder về | Cylinder nhảy đánh |
 | Octagon | Parry high/mid | Parry low/mid | Parry trên không |
 | Semicircle | Đổi thế tức thì, kể cả giữa đòn | như 5U | như 5U |
-| Star | Cast phép theo số lượng nguyên tố | như 5U | như 5U. 214U cất phép vào Stock |
+| Star | Cast phép theo số lượng nguyên tố | như 5U | như 5U. 214U cất phép vào Stock. L = Băng, M = Điện, H = Lửa. 4X đánh gần, 5X đánh xa, 2X đòn thấp, 6X chống không chiến (gần / 45° / xa) |
+
+## Vũ khí
+
+Cột `Weapon` trong `characters.csv`: Circle cầm đại kiếm, Square long sword, Triangle song đao, Rhombus găng knuckles (nhân vật to nhất, không chạy được), Hexagon gậy hex, Oval ná cao su, Cone & Cyl tay điều khiển rối, Octagon biển STOP, Semicircle katana (thế xanh cầm xuôi, thế hồng cầm ngược), Star sách phép.
 
 ## Cấu trúc thư mục
 

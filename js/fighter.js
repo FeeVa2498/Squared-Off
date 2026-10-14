@@ -389,7 +389,7 @@
         return;
       }
       if (d >= 7) { this.startJump(d); return; }
-      if (i.fwdTapT === i.frame && i.frame - i.lastFwdTap <= C.DASH_WINDOW) { this.setState('dash'); return; }
+      if (i.fwdTapT === i.frame && i.frame - i.lastFwdTap <= C.DASH_WINDOW && this.c.dash > 0) { this.setState('dash'); return; }
       if (i.backTapT === i.frame && i.frame - i.lastBackTap <= C.DASH_WINDOW) { this.setState('backdash'); return; }
       const want = d <= 3 ? 'crouch' : (d === 6 || d === 4) ? 'walk' : 'idle';
       if (this.state !== want) this.setState(want);
@@ -419,6 +419,8 @@
     }
     prejumpStep() {
       this.vx *= 0.5;
+      // [2]8 + nút trong lúc pre-jump vẫn ra charge move (không bị nhảy mất)
+      if (this.c.charges.length && this.tryActions()) return;
       const d = this.inp.rel;
       if (d === 7) this.jumpDir = -1;
       else if (d === 9) this.jumpDir = 1;
@@ -634,6 +636,16 @@
       }
       const extra = (i.frame - p.t) + Math.min(14, this.lastHS);
       const stance = this.gim.stance || '';
+      // charge moves: [4]6X / [2]8X
+      const okAir = (m) => (m.air ? air : m.airOK ? true : !air) && (!m.stance || m.stance === stance) && (m.type !== 'Super' || this.res() >= m.cost);
+      for (const m of c.charges) {
+        if (!okAir(m)) continue;
+        const toOK = m.charge.to === 6 ? [3, 6, 9].includes(p.rel) || i.isFwd() : [7, 8, 9].includes(p.rel) || i.isUp();
+        if (!toOK || !i.charged(m.charge.from)) continue;
+        let pick = c.charges.find((x) => x.charge.from === m.charge.from && x.charge.to === m.charge.to && x.btn === b && okAir(x));
+        if (!pick && b !== 'U') pick = c.charges.filter((x) => x.charge.from === m.charge.from && x.charge.to === m.charge.to && x.btn !== 'U' && okAir(x))[0];
+        if (pick) return { move: pick };
+      }
       const done = new Set();
       for (const m0 of c.motions) {
         const mo = m0.motion;
@@ -651,6 +663,8 @@
           const lmh = cands.filter((m) => m.btn !== 'U').sort((x, y) => Math.abs(ord[x.btn] - ord[b]) - Math.abs(ord[y.btn] - ord[b]));
           pick = lmh[0];
         }
+        // không cancel một chiêu vào chính nó (vd 214L lao rồi bấm H vẫn ra 5H)
+        if (pick && this.state === 'attack' && this.move && pick.id === this.move.d.id) continue;
         if (pick) return { move: pick };
       }
       const d = p.rel;
@@ -688,6 +702,7 @@
         if (this.state === 'airdash' && !(m.air || m.airOK)) return false;
         return true;
       }
+      if (this.state === 'prejump' && m.charge && !m.air && this.w.phase === 'fight') return true;
       if (this.state === 'attack') return this.cancelOK(m);
       return false;
     }
@@ -697,6 +712,8 @@
       if (!cur) return false;
       const d = cur.d;
       if (cur.airCancel && this.mf >= cur.airCancel && this.isAir() && (next.air || next.airOK)) return true;
+      // FreeCancel=N: từ frame N cancel được sang bất kỳ normal/special/super nào (dash lao tới của Triangle)
+      if (d.kv.FreeCancel && this.mf >= +d.kv.FreeCancel && next.id !== d.id && next.type !== 'Unique') return true;
       if (this.G.cancelOK) {
         const r = this.G.cancelOK(this, next);
         if (r !== undefined) return r;
@@ -739,8 +756,9 @@
         this.w.spend(this.idx, m.cost);
         this.w.superFlash(this, m);
       } else if (m.cost > 0) this.w.spend(this.idx, m.cost);
-      const fromDash = this.state === 'dash';
+      const fromDash = this.state === 'dash' || (prevAttack && prevAttack.d.kv.FreeCancel);
       this.momentum = fromDash ? this.vx * 0.9 : 0;
+      if (m.charge) { const ch = this.inp.chg[m.charge.from]; ch.last = 0; ch.n = 0; }
       if (prevAttack && NORMAL_T.has(m.type)) this.chain.push(m.id);
       else this.chain = [m.id];
       const wasAir = this.isAir();

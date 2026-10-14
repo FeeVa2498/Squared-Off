@@ -165,16 +165,15 @@
   R.updateCam = function (W) {
     const [a, b] = W.f;
     const mid = (a.x + b.x) / 2;
-    const dist = Math.abs(a.x - b.x);
-    const viewW = SO.clamp(dist + 900, 1300, 1920);
+    const viewW = C.VIEW_W; // zoom cố định
     const scale = R.W / viewW;
     const camX = SO.clamp(mid - viewW / 2, 0, C.STAGE_W - viewW);
     const top = Math.max(a.y + a.c.h, b.y + b.c.h);
     const offY = Math.max(0, top - 720) * 0.7;
     const cam = R.cam;
     if (!cam.init) { cam.x = camX; cam.scale = scale; cam.offY = offY; cam.init = true; }
-    cam.x += (camX - cam.x) * 0.25;
-    cam.scale += (scale - cam.scale) * 0.12;
+    cam.x = camX;
+    cam.scale = scale;
     cam.offY += (offY - cam.offY) * 0.15;
     // cố định trong biên
     const vw = R.W / cam.scale;
@@ -276,8 +275,8 @@
         else k = Math.max(0, 1 - (t - m.su - m.act) / Math.max(1, m.rec * 0.7));
         const tx = f.facing * (hb.x + hb.w * 0.35), ty = hb.y;
         const kick = hb.y < c.h * 0.42 || (m.d.btn === 'H' && f.moveAir && hb.y < c.h * 0.6);
-        if (kick) P.legT = { x: tx, y: ty, k };
-        else P.armT = { x: tx, y: ty, k };
+        if (kick && !(R.WEAPONS[c.weapon] && (R.WEAPONS[c.weapon].blade || R.WEAPONS[c.weapon].pole) && m.d.btn !== 'L' && hb.y > 30)) P.legT = { x: tx, y: ty, k };
+        else P.armT = { x: tx, y: ty, k, hit: true };
         P.lean = 0.18 * k * (hb.y > c.h ? -1 : 1);
       } else if (m.d.isProj || m.d.type === 'Spell' || m.d.kv.Detonate || m.d.type === 'Unique') {
         const k = t < m.su ? t / m.su : Math.max(0, 1 - (t - m.su) / Math.max(1, m.rec));
@@ -287,6 +286,179 @@
     }
     return P;
   }
+
+  // ------------------------------------------------------------------ vũ khí
+  // len = chiều dài lưỡi/cán (px), idle = góc cầm khi đứng yên (rad, âm = chĩa lên trước)
+  R.WEAPONS = {
+    greatsword: { blade: true, len: 175, w: 30, twoHand: true, color: '#c9d1d8', idle: -1.0, grip: 30 },
+    longsword: { blade: true, len: 140, w: 17, color: '#d6dde3', idle: -1.15, grip: 22 },
+    katana: { blade: true, len: 132, w: 11, curve: 0.12, color: '#e7ecf0', idle: -1.25, grip: 26 },
+    dual_blades: { blade: true, len: 74, w: 13, dual: true, color: '#dfe5ea', idle: -0.55, grip: 14 },
+    staff: { pole: true, len: 185, color: '#8a6a45', idle: -1.42, tipKind: 'hex' },
+    stop_sign: { pole: true, len: 160, color: '#9aa1a8', idle: -1.42, tipKind: 'stop' },
+    knuckles: { gloves: true },
+    spellbook: { book: true },
+    slingshot: { sling: true },
+    marionette: { cross: true },
+  };
+
+  R.weaponPose = function (w, WP) {
+    const f = w.f, fc = w.fc, h = w.front.hand;
+    const rev = f.c.weapon === 'katana' && f.gim && f.gim.stance === 'Arc';
+    let ang;
+    if (w.target) {
+      ang = Math.atan2(w.target.y - h[1], w.target.x - h[0]);
+      // cầm ngược: lưỡi xoay từ phía sau ra trước theo tiến độ đòn
+      if (rev && w.target.k < 1) ang += fc * 2.4 * (1 - w.target.k);
+    } else if (w.P.lying) ang = fc > 0 ? 0.2 : Math.PI - 0.2;
+    else if (w.P.hurt) ang = fc > 0 ? 2.5 : Math.PI - 2.5;
+    else {
+      let a = WP.idle || -1;
+      if (rev) a = 1.95;
+      if (w.P.guard) a = rev ? 1.6 : -1.5;
+      if (w.P.crouch && !rev) a += 0.35;
+      if (f.state === 'attack' && f.move && !w.target) a = rev ? 1.2 : -0.35; // chiêu không có hitbox (cast, lao...)
+      ang = fc > 0 ? a : Math.PI - a;
+    }
+    const len = WP.len || 0;
+    return { ang, base: h, tip: [h[0] + Math.cos(ang) * len, h[1] + Math.sin(ang) * len] };
+  };
+
+  function bladePoly(h, ang, len, wd, grip, curve) {
+    const ca = Math.cos(ang), sa = Math.sin(ang), px = -sa, py = ca;
+    const pts = [];
+    const N = 8;
+    for (let i = 0; i <= N; i++) {
+      const t = i / N, wd2 = wd * (i === N ? 0 : 1 - t * 0.25) * 0.5;
+      const bend = curve ? Math.sin(t * Math.PI * 0.5) * curve * len : 0;
+      pts.push([h[0] + ca * len * t + px * (wd2 + bend), h[1] + sa * len * t + py * (wd2 + bend)]);
+    }
+    for (let i = N - 1; i >= 0; i--) {
+      const t = i / N, wd2 = wd * (1 - t * 0.25) * 0.5;
+      const bend = curve ? Math.sin(t * Math.PI * 0.5) * curve * len : 0;
+      pts.push([h[0] + ca * len * t + px * (-wd2 + bend), h[1] + sa * len * t + py * (-wd2 + bend)]);
+    }
+    return pts;
+  }
+  function drawBlade(ctx, h, ang, WP, colBlade, ink, seed, scale) {
+    scale = scale || 1;
+    const len = WP.len * scale, wd = WP.w * scale, ca = Math.cos(ang), sa = Math.sin(ang);
+    // chuôi
+    R.sketchLine(ctx, h[0] - ca * WP.grip, h[1] - sa * WP.grip, h[0], h[1], seed + 1, { stroke: '#3a2a1e', width: Math.max(6, wd * 0.45) });
+    // lưỡi
+    R.sketchPoly(ctx, bladePoly([h[0] + ca * 6, h[1] + sa * 6], ang, len, wd, 0, WP.curve), seed, { fill: colBlade, stroke: ink, width: 3, noSub: true, amp: 1.1 });
+    // đường gân lưỡi
+    ctx.strokeStyle = 'rgba(80,90,100,0.45)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(h[0] + ca * 14, h[1] + sa * 14); ctx.lineTo(h[0] + ca * len * 0.8, h[1] + sa * len * 0.8); ctx.stroke();
+    // chắn tay
+    const px = -sa, py = ca, gw = Math.max(16, wd * 1.3);
+    R.sketchLine(ctx, h[0] + px * gw, h[1] + py * gw, h[0] - px * gw, h[1] - py * gw, seed + 2, { stroke: ink, width: 6 });
+  }
+
+  R.drawWeapon = function (ctx, w, WP, layer, wt) {
+    const ghost = w.ghost, ink = ghost ? w.ink : INK;
+    const seed = 600 + w.f.idx * 40;
+    const metal = (c) => (ghost ? w.col : c);
+    const f = w.f, fc = w.fc;
+    if (WP.blade) {
+      if (layer === 'back' && WP.dual) {
+        const h = w.back.hand;
+        const a = w.target ? wt.ang + fc * 0.5 : fc > 0 ? -0.2 : Math.PI + 0.2;
+        drawBlade(ctx, h, a, WP, metal(WP.color), ink, seed + 10);
+      }
+      if (layer === 'front') drawBlade(ctx, wt.base, wt.ang, WP, metal(WP.color), ink, seed);
+      return;
+    }
+    if (WP.pole && layer === 'front') {
+      const h = wt.base, ca = Math.cos(wt.ang), sa = Math.sin(wt.ang);
+      const b0 = [h[0] - ca * WP.len * 0.3, h[1] - sa * WP.len * 0.3];
+      R.sketchLine(ctx, b0[0], b0[1], wt.tip[0], wt.tip[1], seed, { stroke: metal(WP.color), width: 9 });
+      R.sketchLine(ctx, b0[0], b0[1], wt.tip[0], wt.tip[1], seed + 1, { stroke: ink, width: 2 });
+      const tx = wt.tip[0], ty = wt.tip[1];
+      if (WP.tipKind === 'stop') {
+        const pts = [];
+        for (let i = 0; i < 8; i++) { const a = Math.PI / 8 + (i / 8) * Math.PI * 2; pts.push([tx + Math.cos(a) * 32, ty + Math.sin(a) * 32]); }
+        R.sketchPoly(ctx, pts, seed + 2, { fill: ghost ? w.col : '#d23a32', stroke: ghost ? ink : '#fff', width: 4, noSub: true, amp: 1 });
+        if (!ghost) {
+          ctx.fillStyle = '#fff'; ctx.font = 'bold 17px ' + FONT; ctx.textAlign = 'center'; ctx.fillText('STOP', tx, ty + 6);
+        }
+      } else {
+        const pts = [];
+        for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2; pts.push([tx + Math.cos(a) * 20, ty + Math.sin(a) * 20]); }
+        if (!ghost && f.state === 'attack') { ctx.globalAlpha *= 0.4; R.sketchEllipse(ctx, tx, ty, 34, 34, seed + 5, { fill: '#7ff0c0', stroke: null }); ctx.globalAlpha /= 0.4; }
+        R.sketchPoly(ctx, pts, seed + 3, { fill: ghost ? w.col : '#bdf0d8', stroke: ghost ? ink : '#1f7a58', width: 4, noSub: true, amp: 1 });
+      }
+      return;
+    }
+    if (WP.gloves && layer === 'hand') {
+      for (const arm of [w.back, w.front]) {
+        const [x, y] = arm.hand;
+        const r = f.c.w * 0.17;
+        R.sketchEllipse(ctx, x, y, r * 1.15, r, seed + (arm === w.front ? 7 : 8), { fill: ghost ? w.col : '#d8a62a', stroke: ink, width: 4, hatch: ghost ? null : '#8a6410' });
+        if (!ghost) {
+          ctx.fillStyle = '#5b4a3a';
+          for (let i = -1; i <= 1; i++) { ctx.beginPath(); ctx.arc(x + fc * r * 0.8, y + i * r * 0.5, 4.5, 0, 7); ctx.fill(); }
+        }
+      }
+      return;
+    }
+    if (WP.book) {
+      const casting = f.state === 'attack' && f.move;
+      if ((layer === 'back' && !casting) || (layer === 'hand' && casting)) {
+        const base = casting ? [w.front.hand[0] + fc * 26, w.front.hand[1] - 10] : [w.back.hand[0] - fc * 6, w.back.hand[1] - 6];
+        const bob = Math.sin((f.w.frame || 0) * 0.12) * 3;
+        const x = base[0], y = base[1] + bob;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(fc * (casting ? -0.15 : 0.25));
+        if (casting && !ghost) {
+          ctx.globalAlpha *= 0.35;
+          R.sketchEllipse(ctx, 0, 0, 46, 38, seed + 4, { fill: '#fff2a6', stroke: null });
+          ctx.globalAlpha /= 0.35;
+          R.sketchPoly(ctx, [[-30, -20], [0, -14], [30, -20], [30, 18], [0, 22], [-30, 18]], seed + 5, { fill: ghost ? w.col : '#fffaf0', stroke: ink, width: 3, noSub: true, amp: 1 });
+          ctx.strokeStyle = ink; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(0, -14); ctx.lineTo(0, 22); ctx.stroke();
+          ctx.strokeStyle = 'rgba(90,90,90,0.5)';
+          for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.moveTo(-24, -8 + i * 9); ctx.lineTo(-6, -6 + i * 9); ctx.moveTo(6, -6 + i * 9); ctx.lineTo(24, -8 + i * 9); ctx.stroke(); }
+        } else {
+          R.sketchRect(ctx, -20, -26, 40, 52, seed + 6, { fill: ghost ? w.col : '#6b3fa0', stroke: ink, width: 3, hatch: ghost ? null : '#3d2160' });
+          if (!ghost) {
+            ctx.fillStyle = '#f2d06b';
+            ctx.beginPath();
+            for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + (i / 10) * Math.PI * 2, r = i % 2 ? 4 : 10; ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
+            ctx.closePath(); ctx.fill();
+          }
+        }
+        ctx.restore();
+      }
+      return;
+    }
+    if (WP.sling && layer === 'hand') {
+      const [x, y] = w.front.hand;
+      const wood = ghost ? w.col : '#8a5a2a';
+      R.sketchLine(ctx, x, y + 4, x, y + 26, seed, { stroke: wood, width: 6 });
+      R.sketchLine(ctx, x, y + 4, x + fc * 6 - 10, y - 20, seed + 1, { stroke: wood, width: 5 });
+      R.sketchLine(ctx, x, y + 4, x + fc * 6 + 10, y - 20, seed + 2, { stroke: wood, width: 5 });
+      if (!ghost) {
+        const pull = f.state === 'attack' && f.move && f.mf < f.move.su ? 26 : 6;
+        ctx.strokeStyle = '#d65ba3'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(x + fc * 6 - 10, y - 20); ctx.lineTo(x - fc * pull, y - 12); ctx.lineTo(x + fc * 6 + 10, y - 20); ctx.stroke();
+      }
+      return;
+    }
+    if (WP.cross && layer === 'hand') {
+      const [x, y] = w.front.hand;
+      const wood = ghost ? w.col : '#a0703a';
+      R.sketchLine(ctx, x - 24, y - 14, x + 24, y - 14, seed, { stroke: wood, width: 6 });
+      R.sketchLine(ctx, x, y - 34, x, y + 6, seed + 1, { stroke: wood, width: 6 });
+      if (!ghost) {
+        ctx.strokeStyle = 'rgba(60,50,40,0.45)'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 5]);
+        for (const ox of [-22, 0, 22]) { ctx.beginPath(); ctx.moveTo(x + ox, y - 14); ctx.lineTo(x + ox + fc * 8, y + 70); ctx.stroke(); }
+        ctx.setLineDash([]);
+      }
+    }
+  };
 
   R.drawFighter = function (ctx, f, opt) {
     opt = opt || {};
@@ -336,9 +508,25 @@
     const front = fc > 0 ? 1 : -1;
     const frontArm = arms[front > 0 ? 1 : 0], backArm = arms[front > 0 ? 0 : 1];
     const frontLeg = legs[front > 0 ? 1 : 0], backLeg = legs[front > 0 ? 0 : 1];
+    const WP = R.WEAPONS[c.weapon] || null;
+    let wTarget = null, magicT = null;
     if (P.armT) {
       const k = P.armT.k === undefined ? 1 : P.armT.k;
-      frontArm.hand = [frontArm.hand[0] + (P.armT.x - frontArm.hand[0]) * k, frontArm.hand[1] + (-P.armT.y - frontArm.hand[1]) * k];
+      let tx = P.armT.x, ty = -P.armT.y;
+      // tay thường không dài ra quá tầm (trừ Oval - nhân vật co giãn); đòn xa của Star hiện phép tại hitbox
+      if (P.armT.hit && !(WP && (WP.blade || WP.pole)) && c.weapon !== 'slingshot') {
+        const sx = frontArm.sh[0], sy = frontArm.sh[1], dx = tx - sx, dy = ty - sy, dd = Math.hypot(dx, dy) || 1;
+        const maxR = c.h * 0.5;
+        if (dd > maxR) { magicT = { x: tx, y: ty, k }; tx = sx + (dx / dd) * maxR; ty = sy + (dy / dd) * maxR; }
+      }
+      if (WP && (WP.blade || WP.pole) && P.armT.hit) {
+        // vũ khí dài: tay chỉ vươn tới gần, phần lưỡi chạm vào vùng hitbox
+        const sx = frontArm.sh[0], sy = frontArm.sh[1], dx = tx - sx, dy = ty - sy, dd = Math.hypot(dx, dy) || 1;
+        const reach = Math.max(dd * 0.35, dd - WP.len * 0.75);
+        wTarget = { x: tx, y: ty, k };
+        tx = sx + (dx / dd) * reach; ty = sy + (dy / dd) * reach;
+      }
+      frontArm.hand = [frontArm.hand[0] + (tx - frontArm.hand[0]) * k, frontArm.hand[1] + (ty - frontArm.hand[1]) * k];
     }
     if (P.legT) {
       const k = P.legT.k;
@@ -367,6 +555,10 @@
         ctx.globalAlpha = 1;
       }
     }
+    const wctx = { f, P, fc, ghost, col, ink, front: frontArm, back: backArm, target: wTarget, bx, bodyCY, bw, bh, c };
+    const wtip = WP ? R.weaponPose(wctx, WP) : null;
+    if (WP && WP.twoHand && wtip) backArm.hand = [frontArm.hand[0] - Math.cos(wtip.ang) * 18, frontArm.hand[1] - Math.sin(wtip.ang) * 18];
+    if (WP) R.drawWeapon(ctx, wctx, WP, 'back', wtip);
     R.limb(ctx, [backArm.sh, elbow(backArm), backArm.hand], seed + 1, { width: limbW, stroke: limbInk });
     R.limb(ctx, [backLeg.hip, backLeg.knee, backLeg.foot], seed + 2, { width: limbW + 1, stroke: limbInk });
     const pts = R.shapePoints(c.shape, bw, bh, f.gim.stance).map((p) => [bx + p[0], bodyCY + p[1]]);
@@ -391,13 +583,17 @@
         }
       }
     }
+    if (WP) R.drawWeapon(ctx, wctx, WP, 'front', wtip);
     R.limb(ctx, [frontLeg.hip, frontLeg.knee, frontLeg.foot], seed + 4, { width: limbW + 1, stroke: ghost ? ink : INK });
     R.limb(ctx, [frontArm.sh, elbow(frontArm), frontArm.hand], seed + 5, { width: limbW, stroke: ghost ? ink : INK });
+    if (WP) R.drawWeapon(ctx, wctx, WP, 'hand', wtip);
     if (!ghost) {
-      ctx.fillStyle = col;
-      ctx.beginPath(); ctx.arc(frontArm.hand[0], frontArm.hand[1], limbW * 1.4, 0, 7); ctx.fill();
-      ctx.lineWidth = 2.5; ctx.strokeStyle = INK; ctx.stroke();
-      R.drawMoveFx(ctx, f, { bx, bodyCY, bw, bh, hand: frontArm.hand, foot: frontLeg.foot, hip: frontLeg.hip, sh: frontArm.sh, useLeg: !!P.legT });
+      if (!WP || !WP.gloves) {
+        ctx.fillStyle = col;
+        ctx.beginPath(); ctx.arc(frontArm.hand[0], frontArm.hand[1], limbW * 1.4, 0, 7); ctx.fill();
+        ctx.lineWidth = 2.5; ctx.strokeStyle = INK; ctx.stroke();
+      }
+      R.drawMoveFx(ctx, f, { bx, bodyCY, bw, bh, magic: magicT, hand: magicT ? [magicT.x, magicT.y] : wtip && (WP.blade || WP.pole) ? wtip.tip : frontArm.hand, realHand: frontArm.hand, foot: frontLeg.foot, hip: frontLeg.hip, sh: frontArm.sh, useLeg: !!P.legT });
       if (f.state === 'block') {
         ctx.globalAlpha = 0.5;
         R.sketchEllipse(ctx, bx + fc * bw * 0.75, bodyCY + (f.crouchBlock ? 20 : 0), 22, bh * 0.8, seed + 7, { stroke: f.fd ? '#3b3' : '#38f', width: 6, fill: f.fd ? 'rgba(80,220,80,0.25)' : 'rgba(80,150,255,0.18)' });
@@ -459,7 +655,22 @@
     const big = d.dmg >= 90 || d.type === 'Super';
     // vệt chém / smear cho mọi đòn đánh tay chân
     const melee = d.hasHitbox && !d.isProj && !d.kv.Detonate && !['Throw', 'CmdGrab', 'AirGrab'].includes(d.type);
-    if (melee && (act || after)) {
+    if (g.magic && (act || pre)) {
+      // phép đánh xa: vòng phù chú tại hitbox + tia nối từ tay
+      const ec = (d.fx && d.fx[0] && ({ fire: '#ff8a1c', ice: '#5fc4ef', elec: '#ffd21f' })[d.fx[0].name]) || R.fighterColor(f);
+      const k = act ? 1 : 0.4;
+      ctx.globalAlpha = 0.85 * k;
+      ctx.strokeStyle = ec; ctx.lineWidth = 4; ctx.setLineDash([10, 8]);
+      ctx.beginPath(); ctx.moveTo(g.realHand[0], g.realHand[1]); ctx.lineTo(g.magic.x, g.magic.y); ctx.stroke();
+      ctx.setLineDash([]);
+      const r = 26 + (act ? 10 : 0);
+      R.sketchEllipse(ctx, g.magic.x, g.magic.y, r, r, 950, { fill: 'rgba(255,255,255,0.55)', stroke: ec, width: 5 });
+      for (let i = 0; i < 6; i++) {
+        const a = f.w.frame * 0.2 + (i / 6) * 6.28;
+        R.sketchLine(ctx, g.magic.x + Math.cos(a) * r * 0.5, g.magic.y + Math.sin(a) * r * 0.5, g.magic.x + Math.cos(a) * r * 1.4, g.magic.y + Math.sin(a) * r * 1.4, 960 + i, { stroke: ec, width: 3 });
+      }
+      ctx.globalAlpha = 1;
+    } else if (melee && (act || after)) {
       const slash = fxs.has('slash');
       const k = act ? 1 : 1 - (t - m.su - m.act) / 6;
       const px = g.useLeg ? g.hip[0] : g.bx, py = g.useLeg ? g.hip[1] : g.bodyCY;
@@ -566,7 +777,8 @@
       }
       return;
     }
-    const fadeIn = Math.min(1, p.t / 3);
+    const armed = p.t >= (p.arm || 0);
+    const fadeIn = armed ? Math.min(1, p.t / 3) : 0.35 + 0.25 * Math.sin(p.t * 0.4);
     ctx.globalAlpha = fadeIn;
     switch (p.kind) {
       case 'straight': case 'angled': {

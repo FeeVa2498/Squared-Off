@@ -103,6 +103,7 @@
         this.koSlow--;
         if (this.koSlow % 3) return;
       }
+      for (const f of this.f) f.px = f.x;
       for (const f of this.f) f.tick();
       this.updateGrab();
       for (const p of this.projs) this.updateProj(p);
@@ -140,7 +141,7 @@
     resolvePush() {
       const [a, b] = this.f;
       const lo = (f) => 80 + f.c.w / 2, hi = (f) => C.STAGE_W - 80 - f.c.w / 2;
-      const pass = (f) => (f.state === 'attack' && f.move && f.move.d.tags.has('PassThrough') && f.mf >= f.move.su - 1 && f.mf < f.move.su + f.move.act + 6) || f.vanish;
+      const pass = (f) => (f.state === 'attack' && f.move && f.move.d.tags.has('PassThrough') && f.mf >= f.move.su - 1 && f.mf < (f.move.act > 0 ? f.move.su + f.move.act + 6 : f.move.total)) || f.vanish;
       if (!this.grab && !pass(a) && !pass(b) && a.state !== 'ko' && b.state !== 'ko') {
         const pa = a.pushbox(), pb = b.pushbox();
         if (SO.overlap(pa, pb)) {
@@ -163,13 +164,19 @@
           for (const f of this.f) f.x = SO.clamp(f.x, lo(f), hi(f));
         }
       }
-      // giới hạn khoảng cách camera
+      // mép màn hình: camera cố định zoom nên hai người không thể xa nhau quá bề rộng khung nhìn.
+      // Ai đang di chuyển ra xa thì bị chặn (như đụng tường), người kia không bị kéo theo.
+      const maxD = C.VIEW_W - a.c.w * 0.5 - b.c.w * 0.5 - C.SCREEN_MARGIN * 2;
       const d = b.x - a.x;
-      if (Math.abs(d) > C.MAX_DIST) {
-        const over = Math.abs(d) - C.MAX_DIST;
-        const s = SO.sign(d);
-        const am = Math.abs(a.vx) + Math.abs(a.pushV), bm = Math.abs(b.vx) + Math.abs(b.pushV);
-        if (am >= bm) a.x += s * over; else b.x -= s * over;
+      if (Math.abs(d) > maxD) {
+        const over = Math.abs(d) - maxD;
+        const s = SO.sign(d) || 1;
+        const awayA = Math.max(0, -(a.x - (a.px ?? a.x)) * s), awayB = Math.max(0, (b.x - (b.px ?? b.x)) * s);
+        const tot = awayA + awayB;
+        const ka = tot > 0 ? awayA / tot : 0.5;
+        a.x += s * over * ka;
+        b.x -= s * over * (1 - ka);
+        for (const f of this.f) f.x = SO.clamp(f.x, lo(f), hi(f));
       }
     }
 
@@ -240,13 +247,17 @@
       // projectile có tag Fullscreen bay tới hết màn hình (Active chỉ còn ý nghĩa hiển thị)
       if (d.tags.has('Fullscreen') && (kind === 'straight' || kind === 'angled' || kind === 'orb')) p.life = 400;
       if (d.kv.Life) p.life = +d.kv.Life;
+      // Arm=N: projectile hiện ra nhưng chưa gây sát thương trong N frame (đĩa đặt bẫy của Triangle)
+      p.arm = +d.kv.Arm || 0;
+      p.life += p.arm;
+      p.friction = +d.kv.Friction || 1;
       if (override) Object.assign(p, override);
       const multi = ['orb', 'cloud', 'beam', 'pillar', 'burst', 'wave', 'line', 'rain'].includes(kind);
-      p.interval = multi ? Math.max(3, Math.floor(p.life / Math.max(1, p.hitsLeft))) : 6;
+      p.interval = multi || p.arm ? Math.max(3, Math.floor((p.life - (p.arm || 0)) / Math.max(1, p.hitsLeft))) : 6;
       if (kind === 'pillar' && p.hitsLeft > 1) p.interval = Math.max(3, Math.floor(p.life / p.hitsLeft));
       return p;
     }
-    projActive(p) { return !p.dead && p.delay <= 0 && (!p.fall || true); }
+    projActive(p) { return !p.dead && p.delay <= 0 && p.t >= (p.arm || 0); }
     updateProj(p) {
       if (p.dead) return;
       if (p.hitstop > 0) { p.hitstop--; return; }
@@ -259,6 +270,7 @@
         p.facing = o.facing;
         if (o.state === 'hitstun' || o.state === 'airhit' || o.state === 'thrown') p.dead = true;
       }
+      if (p.friction !== 1) p.vx *= p.friction;
       p.x += p.vx;
       p.y += p.vy;
       if (p.fall && p.y - p.h / 2 <= 0) { p.y = p.h / 2; p.vy = 0; if (!p.landed) { p.landed = true; p.life = Math.min(p.life, 14); this.fx.push({ type: 'dust', x: p.x, y: 0, t: 0, life: 16, big: true }); } }

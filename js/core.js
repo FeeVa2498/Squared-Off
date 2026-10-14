@@ -9,7 +9,10 @@
   SO.CFG = {
     FPS: 60,
     STAGE_W: 2800,
-    MAX_DIST: 1400, // khoảng cách tối đa giữa 2 người (giới hạn camera)
+    VIEW_W: 1500, // bề rộng khung nhìn (world px) — camera không zoom
+    SCREEN_MARGIN: 24, // khoảng cách tối thiểu từ người chơi tới mép màn hình
+    CHARGE: 40, // số frame giữ để charge ([4]6, [2]8)
+    CHARGE_KEEP: 10, // giữ charge thêm bao nhiêu frame sau khi nhả
     KBX_GROUND: 3, // Knockback_X * 3 = vận tốc đẩy lùi trên đất (px/f)
     KBX_AIR: 2.2, // Knockback_X * 2.2 = vận tốc ngang khi bị hất tung
     KBY: 2, // Knockback_Y * 2 = vận tốc bay lên (px/f)
@@ -221,7 +224,9 @@
     if (m.air) inp = inp.slice(2);
     m.motion = null; m.dir = 5; m.prox = ''; m.btn = '';
     let mm;
-    if ((mm = inp.match(/^([cf])([LMHU])$/))) { m.prox = mm[1]; m.btn = mm[2]; }
+    m.charge = null;
+    if ((mm = inp.match(/^\[([42])\]([689])([LMHU])$/))) { m.charge = { from: +mm[1], to: +mm[2] }; m.btn = mm[3]; }
+    else if ((mm = inp.match(/^([cf])([LMHU])$/))) { m.prox = mm[1]; m.btn = mm[2]; }
     else if ((mm = inp.match(/^(\d+)([LMHU])$/))) {
       if (mm[1].length === 1) m.dir = +mm[1];
       else m.motion = mm[1];
@@ -252,6 +257,7 @@
       h: num(r.Height, 186),
       throwR: num(r.Throw_Range, 150),
       color: r.Color || '#888',
+      weapon: r.Weapon || '',
       gimmick: r.Gimmick || '',
     };
   }
@@ -264,7 +270,7 @@
     cp.rows.forEach((r) => {
       if (!r.Character) return;
       const c = normChar(r);
-      c.moves = []; c.normals = {}; c.motions = []; c.unique = {}; c.spells = {}; c.byId = {};
+      c.moves = []; c.normals = {}; c.motions = []; c.charges = []; c.unique = {}; c.spells = {}; c.byId = {};
       DB.chars[c.name] = c;
       DB.order.push(c.name);
     });
@@ -280,7 +286,9 @@
       if (m.kv.Spell) { c.spells[m.kv.Spell] = m; return; }
       if (['Followup', 'Puppet', 'System', 'Burst', 'Throw'].includes(m.type)) return;
       if (!m.btn) return;
-      if (m.motion) {
+      if (m.charge) {
+        c.charges.push(m);
+      } else if (m.motion) {
         c.motions.push(m);
       } else if (m.btn === 'U') {
         c.unique[(m.air ? 'j' : 'g') + (m.dir === 2 || m.dir === 1 || m.dir === 3 ? '2' : '5')] = m;
@@ -368,6 +376,7 @@
       this.buf = []; // {b, t}
       this.fwdTapT = -99; this.backTapT = -99; this.backStartT = -99;
       this.downT = -99; this.upT = -99; this.t9 = -99; this.t7 = -99;
+      this.chg = { 4: { n: 0, last: 0, rel: -99 }, 2: { n: 0, last: 0, rel: -99 } };
       this.compUsedT = -99;
       this.log = []; // lịch sử để hiển thị
     }
@@ -390,6 +399,12 @@
       if (this.rel <= 3) this.downT = frame;
       if (this.rel >= 7) this.upT = frame;
       if (this.rel === 9) this.t9 = frame;
+      // charge: đếm số frame giữ lùi (1/4/7) và giữ xuống (1/2/3)
+      for (const [k, on] of [[4, this.rel === 1 || this.rel === 4 || this.rel === 7], [2, this.rel <= 3]]) {
+        const c = this.chg[k];
+        if (on) c.n++;
+        else if (c.n > 0) { c.last = c.n; c.rel = frame; c.n = 0; }
+      }
       if (this.rel === 7) this.t7 = frame;
       let anyNew = false;
       for (const b of ['L', 'M', 'H', 'U']) {
@@ -445,6 +460,12 @@
       this.buf.forEach((p) => p.t++);
       for (const b of ['L', 'M', 'H', 'U']) if (this.pressT[b] < this.frame) this.pressT[b]++;
       for (const k of ['fwdTapT', 'lastFwdTap', 'backTapT', 'lastBackTap', 'backStartT', 'downT', 'upT', 't9', 't7', 'compUsedT']) if (this[k] < this.frame && this[k] > -90) this[k]++;
+    }
+    // đã charge đủ hướng k (4 hoặc 2) chưa (đang giữ hoặc vừa nhả trong CHARGE_KEEP frame)
+    charged(k, need) {
+      const c = this.chg[k];
+      need = need || SO.CFG.CHARGE;
+      return c.n >= need || (c.last >= need && this.frame - c.rel <= SO.CFG.CHARGE_KEEP);
     }
     heldCount() { return ['L', 'M', 'H'].filter((b) => this.held[b]).length; }
   }

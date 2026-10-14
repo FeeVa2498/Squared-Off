@@ -16,7 +16,10 @@
     const out = [];
     const push = (d, btns, n) => { for (let k = 0; k < (n || 2); k++) { const r = dirRaw(d); (btns || []).forEach((b) => (r[b] = true)); out.push(r); } };
     let btn = m.btn || 'L';
-    if (m.motion) {
+    if (m.charge) {
+      push(m.charge.from, null, 45);
+      push(m.charge.to, [btn], 2);
+    } else if (m.motion) {
       const ds = m.motion.split('').map(Number);
       ds.forEach((d, i) => push(d, i === ds.length - 1 ? [btn] : null, 2));
     } else {
