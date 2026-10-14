@@ -32,6 +32,8 @@
       this.eq = 0;
       this.timer = C.ROUND_TIME * 60;
       this.freeze = 0;
+      this.slowmo = null;
+      this.chZoom = null;
       this.flash = null;
       this.grab = null;
       this.koSlow = 0;
@@ -98,6 +100,11 @@
         this.freeze--;
         if (this.freeze === 0) this.flash = null;
         return;
+      }
+      if (this.chZoom) { this.chZoom.t++; if (this.chZoom.t >= this.chZoom.life) this.chZoom = null; }
+      if (this.slowmo && this.slowmo.t > 0) {
+        this.slowmo.t--;
+        if (this.frame % this.slowmo.every) return;
       }
       if (this.koSlow > 0) {
         this.koSlow--;
@@ -208,6 +215,13 @@
         case 'disc':
           p.x = f.x + fc * (hb.x + k * 40); p.y = hb.y; p.vx = fc * d.spd; p.clash = true; p.delay = k * stepF;
           break;
+        case 'ray': {
+          // tia chéo bắn lên từ mặt đất (Circle 236L); bản EX bắn nhiều tia nối tiếp ra xa
+          const a = ((+d.kv.Angle || 40) * Math.PI) / 180;
+          p.x = f.x + fc * (dist + k * gap); p.y = Math.max(hb.y, 20); p.vx = fc * d.spd * Math.cos(a); p.vy = d.spd * Math.sin(a);
+          p.delay = k * stepF; p.clash = true; p.kind = 'ray';
+          break;
+        }
         case 'angled': {
           const a = ((+d.kv.Angle || 0) * Math.PI) / 180;
           p.x = f.x + fc * hb.x; p.y = f.y + hb.y; p.vx = fc * d.spd * Math.cos(a); p.vy = d.spd * Math.sin(a); p.clash = true;
@@ -442,7 +456,7 @@
         def.hp -= chip;
       }
       const dir = SO.sign(def.x - c.srcX) || att.facing;
-      const push = d.kbx * C.KBX_GROUND * (fd ? C.FD_PUSH : 1) * 0.9;
+      const push = Math.max(C.MIN_PUSH, d.kbx) * C.KBX_GROUND * (fd ? C.FD_PUSH : 1) * 0.9;
       def.vx = dir * push;
       if (air) def.vy = Math.max(def.vy, 2);
       if (c.type === 'strike' && def.atWall(dir)) att.pushV = -dir * push * 0.8;
@@ -464,7 +478,14 @@
     doHit(c) {
       const { att, def, inst } = c;
       const d = inst.d;
-      const ch = def.state === 'attack' && def.move && def.mf < def.move.su + def.move.act && def.move.d.type !== 'Burst' && def.move.d.type !== 'Throw';
+      let ch = def.state === 'attack' && def.move && def.mf < def.move.su + def.move.act && def.move.d.type !== 'Burst' && def.move.d.type !== 'Throw';
+      if (inst.chCarry && def.combo.hits > 0) ch = true; // hit 2 của chiêu nhiều phần giữ trạng thái counter của hit 1
+      if (ch && c.type === 'strike') att.chMove = true;
+      const chTier = !ch ? 0 : d.type === 'Super' ? 3 : d.btn === 'L' ? 1 : d.btn === 'M' ? 2 : d.btn === 'H' ? 3 : d.dmg >= 70 ? 3 : 2;
+      // CH=Kbt:Kby:Untech  → thuộc tính thay thế khi counter hit
+      let kbt = d.kbt, kby = d.kby, untBase = d.unt;
+      if (ch && d.kv.CH) { const p = d.kv.CH.split(':'); kbt = p[0] || kbt; if (p[1]) kby = +p[1]; if (p[2]) untBase = +p[2]; }
+      const gBounce = d.tags.has('GroundBounce') || (ch && d.tags.has('CHGroundBounce'));
       if (def.combo.hits === 0) { def.combo.scale = 1; def.combo.dmg = 0; }
       const wasCrouch = def.isCrouchPose() && !def.isAir();
       let dmg = 0;
@@ -478,7 +499,8 @@
       def.burst = Math.min(100, def.burst + dmg * C.BURST_ON_DMG);
       const away = SO.sign(def.x - c.srcX) || att.facing;
       const freeze = +d.kv.Freeze || 0;
-      const airborneHit = def.isAir() || d.kbt === 'Launch' || d.kbt === 'Knockdown' || d.kbt === 'Hard_Knockdown';
+      const airborneHit = def.isAir() || kbt === 'Launch' || kbt === 'Knockdown' || kbt === 'Hard_Knockdown' || gBounce;
+      const kbx = Math.max(C.MIN_PUSH, d.kbx);
       def.move = null;
       def.moveAir = false;
       def.guard = false;
@@ -486,29 +508,35 @@
       if (!airborneHit) {
         def.setState('hitstun');
         def.crouchHit = wasCrouch;
-        def.stun = Math.max(C.MIN_STUN, def.stunBase(inst, false) + (wasCrouch ? C.CROUCH_HITSTUN : 0) + (ch ? C.CH_HITSTUN : 0) + freeze - Math.floor(def.combo.hits / 8));
-        def.vx = away * d.kbx * C.KBX_GROUND;
+        def.stun = Math.max(C.MIN_STUN, def.stunBase(inst, false) + (wasCrouch ? C.CROUCH_HITSTUN : 0) + C.CH_HITSTUN[chTier] + freeze - Math.floor(def.combo.hits / 8));
+        def.vx = away * kbx * C.KBX_GROUND;
         def.vy = 0;
       } else {
         def.setState('airhit');
-        def.kdType = d.kbt;
-        if (d.kby > 0) def.vy = d.kby * C.KBY;
+        def.kdType = kbt === 'Normal' ? 'Launch' : kbt;
+        if (kby !== 0) def.vy = kby * C.KBY;
         else def.vy = def.y > 0 ? 7 : 6;
-        def.vx = away * Math.max(0.5, d.kbx) * C.KBX_AIR;
-        let unt = d.unt > 0 ? d.unt : def.stunBase(inst, false) + 8;
-        unt += freeze + (ch ? C.CH_HITSTUN : 0);
+        def.vx = away * Math.max(0.5, kbx) * C.KBX_AIR;
+        def.groundBounce = gBounce;
+        if (gBounce) { def.vy = Math.min(def.vy, -10); def.vx *= 0.5; }
+        let unt = untBase > 0 ? untBase : def.stunBase(inst, false) + 8;
+        unt += freeze + C.CH_UNTECH[chTier];
         unt = Math.round(unt * Math.max(C.JUGGLE_MIN, 1 - C.JUGGLE_DECAY * (def.combo.hits - 1)));
         def.untech = Math.max(6, unt);
         def.y = Math.max(def.y, 1);
         if (d.tags.has('WallBounce') || (d.tags.has('WallBounceCorner') && def.nearWall(180))) def.wallBounce = true;
       }
-      if (c.type === 'strike' && !def.isAir() && def.atWall(away)) att.pushV = -away * d.kbx * C.KBX_GROUND * 0.8;
+      if (c.type === 'strike' && !def.isAir() && def.atWall(away)) att.pushV = -away * kbx * C.KBX_GROUND * 0.8;
+      if (chTier) {
+        this.slowmo = { t: C.CH_SLOW[chTier], every: chTier === 3 ? 3 : 2 };
+        if (chTier === 3) this.chZoom = { t: 0, life: C.CH_SLOW[3] + 10, x: c.box.cx, y: c.box.cy };
+      }
       if (c.type === 'strike') { att.contact = 'hit'; att.hitstop = d.hsa; }
       else if (c.type === 'puppet' && c.cyl) { c.cyl.hitstop = d.hsa; c.cyl.contact = 'hit'; }
       def.hitstop = d.hsd;
       if (c.proj) c.proj.hitstop = Math.min(d.hsd, 6);
       this.gain(att.idx, d.gain);
-      if (ch) this.fx.push({ type: 'text', x: def.x, y: def.y + 240, text: 'COUNTER', t: 0, life: 40, color: '#d22' });
+      if (ch) this.fx.push({ type: 'text', x: def.x, y: def.y + 240, text: chTier === 3 ? 'COUNTER!!' : 'COUNTER', t: 0, life: 40, color: '#d22', big: chTier === 3 });
       this.fx.push({ type: 'hit', x: c.box.cx - SO.sign(c.box.cx - def.x) * c.box.w * 0.25, y: c.box.cy, t: 0, life: 14, size: 18 + Math.min(40, dmg * 0.6), color: ch ? '#d22' : '#222' });
       SO.FXR.onHit(this, c, dmg, ch);
       this.stats.comboDmg = def.combo.dmg;

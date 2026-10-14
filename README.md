@@ -91,11 +91,57 @@ Các tag ngăn cách bằng dấu `|`. Tag dạng `Key=Value` có tác dụng tr
 | `Fx=tên[:màu],...` | Hiệu ứng hình ảnh: `fire` (đấm lửa), `ice`, `elec`, `prism`, `wind`, `spin`, `quake`, `heavy`, `slash`, `petal`, `smoke`, `dust`, `spark`, `metal`, `stretch`, `bounce`, `stop`, `burst`. Ví dụ `Fx=slash:#4aa3d9,heavy`. |
 | `WallBounce` / `WallBounceCorner`, `Freeze=N`, `Push`, `BlockProj`, `PassThrough`, `NoExtHurt` | Các hiệu ứng phụ. |
 
+## Luật chung
+
+- **Gatling** đi từ thấp lên cao: L > M > H, và L vào thẳng H được (thường sẽ có gap, không phải true blockstring).
+- **Cùng một nút**, bản đứng và bản ngồi cancel qua lại được (5L <> 2L, 5H > 2H, 2M > cM…), mỗi chiêu một lần trong chuỗi. Gatling M lần hai từ cM sẽ tự ra fM.
+- **Jab** tự gatling vào nhau và vào chính nó (2L 2L 5L 5L). 5L có startup 6f, 2L có startup 7f.
+- **Jump cancel** (khi đòn trúng): 5L, 5M, 5H, 2H. 6M và 6H không jump cancel được. Trên không, jump cancel tức là nhảy kép. Star có luật riêng.
+- **Super cancel:** chiêu nào special cancel được thì cũng super cancel được.
+- **Pushback:** mọi đòn trúng hoặc bị đỡ đều đẩy đối thủ lùi lại tối thiểu một đoạn.
+- **Knockdown:** đối thủ nằm 11f rồi mới bắt đầu dậy. Hard knockdown là 30f.
+- **Counter hit:**
+  - Hitstun cộng thêm: L +3f, M +5f, H +8f.
+  - Untech cộng thêm: L +6f, M +10f, H +16f.
+  - Hiệu ứng: CH bằng đòn L làm màn hình chậm 10f, đòn M chậm 20f, đòn H chậm 34f kèm zoom camera vào điểm trúng.
+  - Cột `Properties` có thể khai `CH=Kbt:Kby:Untech` để đổi thuộc tính đòn khi counter hit, và `CHGroundBounce` để đòn gây ground bounce khi counter hit.
+- **Roman Cancel (L+M+H):**
+  - **Vàng (25%):** khi đòn đang ở startup hoặc active và đối thủ không bị stun. Giữ nguyên đà di chuyển, làm đối thủ chậm lại. Ví dụ dùng sau khi bắn projectile để lao vào.
+  - **Đỏ (50%):** khi đối thủ đang bị hitstun hoặc blockstun.
+  - **Tím (50%):** khi đang recovery, đang tự do, hoặc khi chính mình đang bị đánh.
+- **Hiệu ứng trên người bị đánh:** trúng đòn lửa thì bị cháy, trúng đòn điện thì bị giật. Hiệu ứng đóng băng sẽ làm sau.
+
+## Circle
+
+Rushdown cầm đại kiếm. Có hệ thống token: bấm 5U để nạp 1 token (icon ngọn lửa cạnh thanh Equilibrium), special kế tiếp sẽ thành bản EX và tiêu mất token.
+
+| Lệnh | Chiêu |
+|---|---|
+| 5L / 2L | Đánh bằng chuôi kiếm, kiếm cầm ngược. Tự gatling vào nhau được |
+| cM / fM | Chém dọc xuống ở gần / vươn người chém ngang ở xa |
+| 5H | Chém ngang, chậm nhưng đau, proration 100% |
+| 2M | Cúi người chém ngang, đòn low |
+| 2H | Hất kiếm lên (launcher), jump cancel được |
+| 3H | Quay lưng đâm xuống chân, đòn low gây knockdown |
+| 6M | Nhảy ngắn đấm chuôi kiếm, overhead. +2 khi bị đỡ, trúng thì link được vào 5L |
+| 6H | Hit 1 hất kiếm lên (special cancel được), hit 2 bổ xuống (unsafe). Counter hit: hit 1 hất tung, hit 2 gây ground bounce |
+| 236L | Đấm đất bắn tia lửa chéo lên, +1 khi bị đỡ ở max tầm. Bản EX: 3 tia nối tiếp gần full màn hình |
+| 214M | Lăn tròn 3 hit, unsafe. Bản EX: nhanh hơn, +2 khi bị đỡ, trúng thì hất tung |
+| 623M / 623H | Kiếm bốc lửa, đối thủ trúng thì bị cháy. 623M bất tử 1–7f. Bản EX: hard knockdown, đối thủ không tech được. Có cả bản trên không |
+| 623L | Command grab, xách cổ hất tung lên, nối được combo trên không |
+| 5U | Nạp token (startup 30f). Cancel từ normal sang 5U thì ra Power Burst: startup 6f, hất tung nhẹ và vẫn nạp token |
+| 2U | Bắn tia lửa thấp: đòn low, disjoint, không special cancel được |
+| j.U | Bắn nổ ở cự ly sát, bản thân bị đẩy ra sau. Trúng gần góc thì đối thủ wall bounce |
+| 214214M | Dragon Install: trong 8 giây mọi special đều là bản EX mà không tốn token. 5U thành Dragon Blast (+3 khi bị đỡ) |
+| 236236H | Meteor Drive: lao tới bốc lửa như thiên thạch |
+
+Combo demo (đã test, khoảng 15 hit / 317 sát thương): c.M f.M 5H 3H 214M (EX) c.M 2H jc j.L j.M jc j.M j.H j.623H
+
 ## Gimmick nút U
 
 | Nhân vật | 5U | 2U | j.U |
 |---|---|---|---|
-| Circle | Ngay sau special: Rolling Install. Khi tự do: lăn tới | Lăn lùi | Lăn bổ nhào |
+| Circle | Nạp token / Power Burst khi cancel | Tia lửa thấp | Bắn nổ cự ly sát |
 | Square | Vòng Prism giữa | Vòng sát đất | Vòng nghiêng xuống |
 | Triangle | Apex chéo lên trước | Apex chéo lên sau | Apex chéo xuống. 214L lao tới, cancel được sang chiêu khác, side swap khi ở gần. Đĩa 236L có độ trễ 30f mới gây sát thương |
 | Rhombus | Grip Shift (armor mid/high) | Grip Shift (armor low/mid) | Bổ nhào có armor |

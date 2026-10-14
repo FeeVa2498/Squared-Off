@@ -642,6 +642,20 @@
     text('EQUILIBRIUM', ex, ey - 26, 22, '#555', 'center');
     const tags = (r) => (r >= 50 ? 'SUPER/RC' : r >= 25 ? 'DA' : '');
     text(tags(r0), ex - ew / 2 + 10, ey + 50, 22, '#b22', 'left');
+    // token (vd Circle power-up): huy hiệu ngọn lửa cạnh thanh lực
+    for (const f of W.f) {
+      const n = f.G.tokens ? f.G.tokens(f) : 0;
+      for (let k = 0; k < n; k++) {
+        const tx = f.idx === 0 ? ex - ew / 2 - 175 - k * 40 : ex + ew / 2 + 175 + k * 40, ty = ey - 2;
+        const pulse = 1 + 0.08 * Math.sin(W.frame * 0.25);
+        ctx.save(); ctx.translate(tx, ty); ctx.scale(pulse, pulse);
+        ctx.fillStyle = '#e2401b'; ctx.strokeStyle = INK; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(0, -22); ctx.quadraticCurveTo(16, -6, 12, 8); ctx.quadraticCurveTo(8, 18, 0, 18); ctx.quadraticCurveTo(-8, 18, -12, 8); ctx.quadraticCurveTo(-14, -4, -4, -10); ctx.quadraticCurveTo(-2, -2, 2, -4); ctx.closePath();
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#ffd84a'; ctx.beginPath(); ctx.arc(0, 8, 6, 0, 7); ctx.fill();
+        ctx.restore();
+      }
+    }
     text(tags(r1), ex + ew / 2 - 10, ey + 50, 22, '#236', 'right');
     // combo
     const st = W.stats;

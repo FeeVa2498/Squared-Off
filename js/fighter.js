@@ -359,6 +359,17 @@
           this.moveAir = false;
           this.resetAir();
         }
+      } else if (s === 'airhit' && this.groundBounce) {
+        // ground bounce: nảy lên lại để combo tiếp
+        this.groundBounce = false;
+        this.y = 1;
+        this.vy = 12;
+        this.vx *= 0.6;
+        this.sf = 0;
+        this.untech = Math.max(this.untech - this.sf, 26);
+        this.w.fx.push({ type: 'dust', x: this.x, y: 0, t: 0, life: 22, big: true });
+        this.w.fx.push({ type: 'crack', x: this.x, y: 0, t: 0, life: 40 });
+        this.w.quake = Math.max(this.w.quake || 0, 8);
       } else if (s === 'airhit') {
         this.resetAir();
         this.vx *= 0.3;
@@ -410,11 +421,13 @@
       if (i.rel === 4 && i.prevRel === 5 && i.frame - i.t7 <= 10) return -1;
       return 0;
     }
-    startJump(d) {
+    startJump(d, fromCancel) {
       this.iadQueued = 0;
+      // jump cancel: chỉ thành super jump nếu bấm xuống SAU khi đòn bắt đầu (2H rồi 9 là nhảy thường)
+      const sj = this.inp.recentDown(C.SJ_WINDOW) && (!fromCancel || (this.inp.downTaps || 0) > this.downTapsAtMove);
       this.setState('prejump');
       this.jumpDir = d === 7 ? -1 : d === 9 ? 1 : 0;
-      this.superJump = this.inp.recentDown(C.SJ_WINDOW);
+      this.superJump = sj;
       this.jumpMomentum = this.vx;
     }
     prejumpStep() {
@@ -469,6 +482,17 @@
         if (i.fwdTapT === i.frame && i.frame - i.lastFwdTap <= C.DASH_WINDOW) { this.startAirdash(1); return; }
         if (i.backTapT === i.frame && i.frame - i.lastBackTap <= C.DASH_WINDOW) { this.startAirdash(-1); return; }
       }
+    }
+    airJump(d) {
+      this.airJumps--;
+      const dir = d === 7 ? -1 : d === 9 ? 1 : 0;
+      this.move = null;
+      this.moveAir = false;
+      this.setState('air');
+      this.vy = this.c.jumpV * 0.92;
+      this.vx = dir * this.c.jumpX * this.facing * 0.8;
+      this.sf = 1;
+      this.w.fx.push({ type: 'ring', x: this.x, y: this.y, t: 0, life: 12, r: 40, color: '#999' });
     }
     startAirdash(dir) {
       this.airDashes--;
@@ -557,9 +581,10 @@
         const rc = SO.sysMove(this.c, 'RC');
         const okState = NEUTRAL.has(s) || ['air', 'dash', 'attack', 'hitstun', 'airhit', 'land', 'airdash', 'prejump', 'dashstop', 'backdash'].includes(s);
         const notSuper = !(s === 'attack' && this.move && (this.move.d.type === 'Super' || this.move.d.type === 'Burst'));
-        if (rc && okState && notSuper && W.res(this.idx) >= rc.cost) {
+        const rk = rc && this.rcKind(rc);
+        if (rc && okState && notSuper && W.res(this.idx) >= rk.cost) {
           this.consumeComposite();
-          this.doRC(rc);
+          this.doRC(rc, rk);
           return true;
         }
       }
@@ -685,6 +710,11 @@
           if (c.normals['gc' + b]) {
             const close = Math.abs(this.opp.x - this.x) - (this.opp.c.w + c.w) * 0.3 < C.CLOSE_RANGE;
             m = c.normals[(close ? 'gc' : 'gf') + b];
+            // đã dùng cM trong chuỗi gatling thì bấm M lần nữa ra fM (và ngược lại)
+            if (this.state === 'attack' && this.chain.includes(m.id)) {
+              const alt = c.normals[(close ? 'gf' : 'gc') + b];
+              if (alt && !this.chain.includes(alt.id)) m = alt;
+            }
           } else m = c.normals['g5' + b];
         }
         if (!m) m = c.normals['g5' + b] || c.normals['gf' + b];
@@ -722,7 +752,7 @@
       const t = this.mf;
       if (t > cur.su + cur.act + Math.min(C.CANCEL_EXTRA, cur.rec)) return false;
       const nt = next.type, ct = d.type;
-      if (nt === 'Super') return cur.suc;
+      if (nt === 'Super') return cur.suc || cur.sc; // special cancel được thì super cancel được
       if (nt === 'Special' || nt === 'Spell' || nt === 'Unique' || nt === 'CmdGrab' || nt === 'AirGrab') {
         return NORMAL_T.has(ct) && cur.sc;
       }
@@ -730,22 +760,30 @@
         if (!NORMAL_T.has(ct)) return false;
         if (next.air !== d.air) return false;
         if (this.G.gatling) return this.G.gatling(this, cur, next);
-        if (this.chain.includes(next.id) && next.btn !== 'L') return false;
         const tc = tier(d), tn = tier(next);
-        return tn > tc || (tn === 1 && tc === 1);
+        // L > M > H (L vào thẳng H cũng được); jab (L) tự gatling vào nhau và vào chính nó
+        if (tn > tc) return next.btn === 'L' || !this.chain.includes(next.id);
+        if (tn < tc) return false;
+        if (tn === 1) return true;
+        // cùng nút: bản đứng / ngồi (5X, 2X, 3X, cX, fX) cancel qua lại, mỗi chiêu một lần
+        const variant = (m) => !!m.prox || m.dir === 5 || m.dir === 2 || m.dir === 3;
+        return !d.air && variant(d) && variant(next) && next.id !== d.id && !this.chain.includes(next.id);
       }
       return false;
     }
 
     startMove(m, opts) {
       opts = opts || {};
+      if (this.G.swap && !opts.noSwap) { const sw = this.G.swap(this, m); if (sw) m = sw; }
+      const chCarry = !!(opts.chCarry && this.chMove);
+      this.chMove = false;
       const prevAttack = this.state === 'attack' ? this.move : null;
       const inst = {
         d: m, id: m.id, su: m.su, act: m.act, rec: m.rec, hits: m.hits,
         hb: { x: m.hb.x, y: m.hb.y, w: m.hb.w, h: m.hb.h },
         dmgMul: 1, armorLeft: m.armor, armorVs: null,
         sc: m.sc, suc: m.suc, jc: m.jc, dc: m.dc, casterAct: m.casterAct,
-        vel: m.vel, airCancel: +m.kv.AirCancel || 0,
+        vel: m.vel, airCancel: +m.kv.AirCancel || 0, chCarry,
       };
       Object.assign(inst, opts.inst || {});
       if (this.G.modify) this.G.modify(this, inst);
@@ -765,6 +803,7 @@
       this.setState('attack');
       this.move = inst;
       this.mf = 0;
+      this.downTapsAtMove = this.inp.downTaps || 0;
       this.contact = null;
       this.hitIdx = -1;
       this.grabbed = false;
@@ -783,6 +822,9 @@
       const t = this.mf;
       // frame 1 của chiêu được xử lý ngay frame bấm; hết frame `total` thì frame kế tiếp là frame tự do
       if (t > inst.total) {
+        // AutoNext=ID: chiêu nhiều phần (vd 6H hất lên rồi bổ xuống) tự nối sang phần sau
+        const nx = d.kv.AutoNext && this.c.byId[d.kv.AutoNext];
+        if (nx) { this.startMove(nx, { chCarry: true, noSwap: true }); this.attackStep(); return; }
         this.endMove();
         if (this.canActNow()) this.tryActions();
         return;
@@ -830,7 +872,13 @@
       const inWin = t <= inst.su + inst.act + Math.min(C.CANCEL_EXTRA, inst.rec);
       const upBuf = this.inp.frame - this.inp.upT <= C.BUFFER;
       if (this.contact === 'hit' && inst.jc && inWin && upBuf && !this.moveAir) {
-        this.startJump(this.inp.isUp() ? this.inp.rel : this.inp.dirAt(this.inp.upT));
+        this.startJump(this.inp.isUp() ? this.inp.rel : this.inp.dirAt(this.inp.upT), true);
+        return;
+      }
+      // jump cancel trên không = nhảy kép
+      if (this.contact === 'hit' && inst.jc && inWin && this.moveAir && this.inp.frame - this.inp.upTapT <= C.BUFFER &&
+          this.airJumps > 0 && !this.superJump && !this.airdashed) {
+        this.airJump(this.inp.dirAt(this.inp.upTapT));
         return;
       }
       if (this.contact && inst.dc && inWin && !this.moveAir) {
@@ -871,26 +919,48 @@
       this.w.fx.push({ type: 'ring', x: this.x, y: this.y + 90, t: 0, life: 12, r: 50, color: this.c.color });
     }
 
-    doRC(rc) {
+    // Roman Cancel: vàng (đòn đang startup/active, đối thủ không bị stun) 25%,
+    // đỏ (đối thủ đang hitstun/blockstun) 50%, tím (đang recovery / tự do / tự mình bị stun) 50%
+    rcKind(rc) {
+      const o = this.opp;
+      const oppStun = o.state === 'hitstun' || o.state === 'airhit' || o.state === 'block';
+      if (oppStun && this.state === 'attack') return { kind: 'red', cost: rc.cost, color: '#e03a2e' };
+      if (this.state === 'attack' && this.move) {
+        const m = this.move;
+        const actEnd = m.su + Math.max(1, m.act) + (m.d.isProj ? 4 : 0);
+        if (this.mf < actEnd && !oppStun) return { kind: 'yellow', cost: +rc.kv.YellowCost || C.RC_YELLOW, color: '#f2c21b' };
+      }
+      return { kind: 'purple', cost: rc.cost, color: '#9a4ad8' };
+    }
+    doRC(rc, rk) {
       const W = this.w;
-      W.spend(this.idx, rc.cost);
+      rk = rk || this.rcKind(rc);
+      W.spend(this.idx, rk.cost);
       const wasStun = this.state === 'hitstun' || this.state === 'airhit';
       const R = +rc.kv.Radius || 260, slow = +rc.kv.Slow || 40, push = +rc.kv.PushBack || 12;
+      const keepVx = this.vx;
       this.move = null;
       if (this.isAir()) { this.setState('air'); this.vy = Math.max(this.vy, 3); this.moveAir = false; }
       else this.setState('idle');
+      if (rk.kind === 'yellow') this.vx = keepVx; // giữ đà để lao vào sau khi bắn projectile
       this.invT = 6;
       this.hitstop = 0;
       const o = this.opp;
-      if (Math.abs(o.x - this.x) < R + 120) {
+      if (rk.kind === 'yellow') {
+        if (Math.abs(o.x - this.x) < R * 2.2) o.slow = Math.max(o.slow, slow - 8);
+      } else if (Math.abs(o.x - this.x) < R + 120) {
         o.slow = Math.max(o.slow, slow);
-        if (wasStun) {
-          o.vx = SO.sign(o.x - this.x) * push;
-          if (o.state === 'attack' && !o.isAir()) o.pushV = SO.sign(o.x - this.x) * push;
+        if (rk.kind === 'red' && (o.state === 'airhit')) o.vy = Math.max(o.vy, 4);
+        if (wasStun || rk.kind === 'purple') {
+          const pv = SO.sign(o.x - this.x) * push * (wasStun ? 1 : 0.6);
+          o.vx = pv;
+          if (o.state === 'attack' && !o.isAir()) o.pushV = pv;
         }
       }
-      W.fx.push({ type: 'ring', x: this.x, y: this.y + 90, t: 0, life: 22, r: R, color: '#d33', thick: 6 });
-      W.fx.push({ type: 'text', x: this.x, y: this.y + 230, text: 'ROMAN CANCEL', t: 0, life: 40 });
+      W.fx.push({ type: 'ring', x: this.x, y: this.y + 90, t: 0, life: 22, r: R, color: rk.color, thick: 7 });
+      W.fx.push({ type: 'ring', x: this.x, y: this.y + 90, t: 0, life: 14, r: R * 0.6, color: rk.color, thick: 4 });
+      W.fx.push({ type: 'text', x: this.x, y: this.y + 230, text: rk.kind.toUpperCase() + ' ROMAN CANCEL', t: 0, life: 40, color: rk.color });
+      W.screenFlash = { t: 0, life: 8, color: rk.color + '55' };
       W.hitstopBoth(6);
     }
 

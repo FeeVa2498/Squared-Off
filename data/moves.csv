@@ -1,16 +1,7 @@
 Move_ID,Character,Input,Stance,Name,Type,Damage,Chip_Damage,Startup,Active,Recovery,On_Block,On_Hit,Untech,Hits,Proration_Rate,Knockback_X,Knockback_Y,Knockback_Type,Block_Type,Special_Cancellable,Super_Cancellable,Jump_Cancellable,Dash_Cancellable,Invincible_Type,Invincible_Frames,Armor_Hits,Hitstop_Attacker,Hitstop_Defender,Hitbox_X,Hitbox_Y,Hitbox_W,Hitbox_H,Projectile_Speed,Air_OK,Cost,Meter_Gain,Properties
-CR_5L,Circle,5L,,Jab,Normal,12,0,4,3,6,1,3,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,62,128,56,28,0,FALSE,0,2,Jab_ExtendedHurtbox
-CR_cM,Circle,cM,,Close Medium,Normal,28,0,7,4,10,-1,2,0,1,0.9,2,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,70,105,70,44,0,FALSE,0,2.6,Close_Proximity
-CR_fM,Circle,fM,,Far Medium,Normal,32,0,9,4,14,-3,1,0,1,0.9,2.5,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,112,112,104,30,0,FALSE,0,2.8,Far_Poke
-CR_5H,Circle,5H,,Heavy Bounce,Normal,65,0,14,5,22,-6,0,40,1,1,2,10,Launch,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,80,150,96,96,0,FALSE,0,4.1,Heavy_Whiff_Punish|Fx=heavy
-CR_6M,Circle,6M,,Overhead Hop,Command,40,0,18,3,16,-2,4,0,1,0.9,3,0,Normal,High,TRUE,TRUE,FALSE,FALSE,None,0,0,7,7,70,140,70,72,0,FALSE,0,3.1,Overhead
-CR_236L,Circle,236L,,Seismic Slam,Special,45,8,11,4,18,-4,0,0,1,0.9,4,2,Knockdown,Mid,FALSE,TRUE,FALSE,FALSE,None,0,0,8,8,90,40,130,70,0,FALSE,0,4,Seismic_PointblankInCorner|WallBounceCorner|Fx=quake
-CR_214M,Circle,214M,,Hairball,Special,60,10,12,12,16,-2,0,0,3,0.85,3,1.5,Knockdown,Mid,FALSE,TRUE,FALSE,FALSE,None,0,0,8,8,70,95,54,54,5,FALSE,0,4,Hairball_MultiHit|Proj=straight|Fx=wind
-CR_623M,Circle,623M,,Rising Roll,Special,75,15,5,6,28,-18,0,0,1,1,3,8,Knockdown,Mid,FALSE,TRUE,FALSE,FALSE,Full,1-6,0,10,10,48,150,76,120,0,FALSE,0,4,Invincible_Startup_DP|Vel=3:16@5-10|Fx=fire
-CR_623H,Circle,623H,,Big Rising Roll,Special,110,20,9,8,34,-24,0,0,2,1,4,12,Hard_Knockdown,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,12,12,48,160,84,140,0,FALSE,0,4,"Combo_Ender_Heavy_DP|Vel=4:20@9-15|Fx=fire,heavy"
-SQ_5L,Square,5L,,Jab,Normal,14,0,5,3,7,0,2,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,66,132,58,28,0,FALSE,0,2.1,Jab
-SQ_cM,Square,cM,,Close Medium,Normal,30,0,8,4,11,-1,3,0,1,0.9,2,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,74,110,72,46,0,FALSE,0,2.7,Close_Proximity
-SQ_fM,Square,fM,,Far Medium,Normal,35,0,10,4,15,-2,2,0,1,0.9,2.8,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,118,116,110,32,0,FALSE,0,2.9,Far_Poke
+SQ_5L,Square,5L,,Jab,Normal,14,0,6,3,7,0,2,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,4,4,66,132,58,28,0,FALSE,0,2.1,Jab
+SQ_cM,Square,cM,,Close Medium,Normal,30,0,8,4,11,-1,3,0,1,0.9,2,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,6,6,74,110,72,46,0,FALSE,0,2.7,Close_Proximity
+SQ_fM,Square,fM,,Far Medium,Normal,35,0,10,4,15,-2,2,0,1,0.9,2.8,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,6,6,118,116,110,32,0,FALSE,0,2.9,Far_Poke
 SQ_5H,Square,5H,,Prism Upper,Normal,70,0,15,5,24,-5,0,42,1,1,2.5,11,Launch,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,78,160,92,110,0,FALSE,0,4.3,Heavy_Starter|Fx=heavy
 SQ_6H,Square,6H,,Edge Drop,Command,45,0,20,4,18,-3,3,0,1,0.9,3.5,0,Normal,High,TRUE,TRUE,FALSE,FALSE,None,0,0,8,8,78,150,80,80,0,FALSE,0,3.3,Overhead
 SQ_236L,Square,236L,,Prism Shot,Special,50,10,13,20,18,-2,2,0,1,0.9,5,0,Normal,Mid,FALSE,TRUE,FALSE,FALSE,None,0,0,6,6,70,120,60,50,8,FALSE,0,4,Fullscreen_Projectile|Proj=straight|Fx=prism
@@ -19,22 +10,41 @@ TR_3H,Triangle,3H,,Tri Sweep,Command,55,0,10,4,20,-6,0,0,1,0.9,2,0,Hard_Knockdow
 TR_2H,Triangle,2H,,Apex Launcher,Normal,60,0,8,5,18,-4,0,42,1,1,1.5,12,Launch,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,8,8,54,175,80,130,0,FALSE,0,3.9,Launcher_AntiAir|Fx=slash
 TR_236L,Triangle,236L,,Disc,Special,30,5,15,45,12,4,0,0,3,0.8,1,0.5,Knockdown,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,6,6,60,16,72,26,6,FALSE,0,4,Disc_Lockdown_Oki|Proj=disc|Arm=30|Friction=0.9|Fx=spark
 ST_U_3E,Star,U(FIL),,Prism Nova (Fire+Ice+Lightning),Spell,130,25,22,15,26,8,0,0,3,1,5,14,Hard_Knockdown,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,14,14,0,160,220,320,0,TRUE,0,4,"Requires_3_Elements|Spell=FIL|Proj=rain|Count=1|Fx=fire,ice,elec"
-CR_2L,Circle,2L,,Crouch Light,Normal,10,0,4,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,66,18,62,24,0,FALSE,0,1.9,PLACEHOLDER
-CR_2M,Circle,2M,,Crouch Medium,Normal,25,0,7,4,13,-2,1,0,1,0.9,2,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,100,22,104,26,0,FALSE,0,2.5,PLACEHOLDER
-CR_2H,Circle,2H,,Bounce Up,Normal,52,0,8,5,20,-6,0,40,1,1,1.5,11,Launch,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,56,170,82,120,0,FALSE,0,3.6,PLACEHOLDER
-CR_3H,Circle,3H,,Roll Sweep,Command,48,0,10,4,22,-8,0,0,1,0.9,2,0,Knockdown,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,112,14,126,24,0,FALSE,0,3.4,PLACEHOLDER|Fx=dust
-CR_jL,Circle,j.L,,Air Light,Normal,9,0,4,4,8,2,4,16,1,0.85,1.2,0,Normal,High,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,58,70,58,40,0,FALSE,0,1.9,PLACEHOLDER
-CR_jM,Circle,j.M,,Air Medium,Normal,23,0,6,5,12,2,4,18,1,0.9,1.8,0,Normal,High,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,74,46,84,50,0,FALSE,0,2.4,PLACEHOLDER
-CR_jH,Circle,j.H,,Air Heavy,Normal,43,0,9,5,18,3,6,22,1,1,2.4,2,Normal,High,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,70,22,104,62,0,FALSE,0,3.2,PLACEHOLDER
-CR_236H,Circle,236H,,Rolling Charge,Special,70,10,14,16,14,-6,0,0,2,0.9,3,5,Knockdown,Mid,FALSE,TRUE,FALSE,FALSE,None,0,0,8,8,36,70,112,112,0,FALSE,0,4,"Vel=12:0@8-29|NoExtHurt|PLACEHOLDER|Fx=spin,fire"
-CR_j236M,Circle,j.236M,,Air Dive Roll,Special,50,8,10,20,10,-3,2,24,1,0.9,2,0,Normal,High,FALSE,TRUE,FALSE,FALSE,None,0,0,8,8,20,50,110,110,0,FALSE,0,4,Vel=8:-12@10-29|LandEnd|PLACEHOLDER|Fx=spin
-CR_236236H,Circle,236236H,,Seismic Rush,Super,240,40,8,20,30,-20,0,0,5,1,4,10,Hard_Knockdown,Mid,FALSE,FALSE,FALSE,FALSE,Full,1-12,0,12,12,40,90,130,150,0,FALSE,50,0,"Vel=14:0@8-27|NoExtHurt|PLACEHOLDER|Fx=fire,spin"
-CR_214214H,Circle,214214H,,Cannonball Crash,Super,200,30,10,16,26,-24,0,0,4,1,2,14,Hard_Knockdown,Mid,FALSE,FALSE,FALSE,FALSE,Full,1-14,0,12,12,30,120,140,160,0,FALSE,50,0,"Vel=5:18@10-25|NoExtHurt|PLACEHOLDER|Fx=fire,heavy"
-CR_U_INSTALL,Circle,U (after special),,Rolling Install,Unique,0,0,1,0,8,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,10,2,Script=install|Dur=180|DmgUp=0.2|ExtraHits=1|Faster=2|PLACEHOLDER
-CR_5U,Circle,5U,,Forward Roll,Unique,0,0,1,0,23,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,Strike,3-14,0,8,8,0,0,0,0,0,FALSE,0,2,Vel=9:0@3-18|PLACEHOLDER|Fx=dust
-CR_2U,Circle,2U,,Back Roll,Unique,0,0,1,0,20,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,Strike,1-12,0,8,8,0,0,0,0,0,FALSE,0,2,Vel=-8:0@3-16|PLACEHOLDER|Fx=dust
-CR_jU,Circle,j.U,,Dive Roll,Unique,40,0,8,12,8,1,3,20,1,0.9,2,0,Normal,High,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,20,50,100,100,0,FALSE,0,2,Vel=9:-10@8-19|LandEnd|PLACEHOLDER|Fx=spin
-SQ_2L,Square,2L,,Crouch Light,Normal,10,0,5,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,66,18,62,24,0,FALSE,0,1.9,PLACEHOLDER
+CR_5L,Circle,5L,,Pommel Jab,Normal,12,0,6,3,7,1,3,0,1,0.85,1.4,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,4,4,58,112,50,30,0,FALSE,0,2,Pose=pommel
+CR_cM,Circle,cM,,Crushing Chop,Normal,28,0,7,4,12,-1,3,0,1,0.9,1.8,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,7,7,92,95,100,130,0,FALSE,0,2.6,
+CR_fM,Circle,fM,,Reverse Reach,Normal,32,0,10,4,15,-3,1,0,1,0.9,2.3,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,6,6,165,112,160,42,0,FALSE,0,2.8,Pose=reverse|Vel=3:0@4-9
+CR_5H,Circle,5H,,Greatsword Sweep,Normal,70,0,14,5,22,-6,4,0,1,1,2.6,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,12,12,150,112,190,76,0,FALSE,0,4.3,Fx=heavy
+CR_2L,Circle,2L,,Low Pommel,Normal,10,0,7,3,8,-1,2,0,1,0.85,1.3,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,62,32,52,28,0,FALSE,0,1.9,Pose=pommel
+CR_2M,Circle,2M,,Low Cleave,Normal,26,0,9,4,14,-3,1,0,1,0.9,2,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,150,34,170,36,0,FALSE,0,2.5,
+CR_2H,Circle,2H,,Rising Reverse,Normal,55,0,9,5,20,-6,0,40,1,1,1.2,11,Launch,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,85,180,105,160,0,FALSE,0,3.7,Pose=reverse|Fx=slash
+CR_3H,Circle,3H,,Back Stab Sweep,Command,45,0,11,4,22,-10,0,0,1,0.9,2,4,Knockdown,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,140,18,160,30,0,FALSE,0,3.3,Pose=reverse|Fx=dust
+CR_6M,Circle,6M,,Hop Pommel,Command,36,0,19,3,10,2,8,0,1,0.9,1.5,0,Normal,High,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,66,120,66,80,0,FALSE,0,2.9,Pose=pommel|Vel=4:9@2-3
+CR_6H,Circle,6H,,Upheave,Command,40,0,15,4,8,2,10,0,1,0.9,1.2,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,95,165,115,140,0,FALSE,0,3.1,AutoNext=CR_6H2|CH=Launch:7:44
+CR_6H2,Circle,6H (hit 2),,Upheave Slam,Followup,55,0,8,4,26,-14,0,0,1,0.9,1.5,2,Knockdown,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,12,12,110,80,130,160,0,FALSE,0,2,"CHGroundBounce|Fx=heavy,quake"
+CR_jL,Circle,j.L,,Air Pommel,Normal,9,0,5,4,8,2,4,16,1,0.85,1,4,Normal,High,TRUE,TRUE,TRUE,FALSE,None,0,0,4,4,60,105,64,80,0,FALSE,0,1.9,Pose=pommel
+CR_jM,Circle,j.M,,Air Downslash,Normal,24,0,7,5,12,2,4,20,1,0.9,1,4,Normal,High,TRUE,TRUE,TRUE,FALSE,None,0,0,6,6,90,20,120,100,0,FALSE,0,2.5,
+CR_jH,Circle,j.H,,Turning Reverse Slash,Normal,45,0,10,5,18,3,6,24,1,1,1.6,5,Normal,High,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,70,50,150,170,0,FALSE,0,3.3,Pose=reverse
+CR_236L,Circle,236L,,Flame Burst,Special,45,8,13,14,20,-13,2,0,1,0.9,3,0,Normal,Mid,FALSE,TRUE,FALSE,FALSE,None,0,0,8,8,0,30,70,70,18,FALSE,0,4,Proj=ray|Dist=80|Angle=40|EX=CR_236L_EX|Fx=fire
+CR_236L_EX,Circle,236L (EX),,Flame Burst EX,Special,90,15,13,14,20,-4,0,0,3,0.9,3,4,Knockdown,Mid,FALSE,TRUE,FALSE,FALSE,None,0,0,8,8,0,30,80,80,18,FALSE,0,4,Proj=ray|Dist=80|Gap=230|Count=3|Step=7|Angle=40|Fx=fire
+CR_214M,Circle,214M,,Cannonball Roll,Special,60,10,12,18,16,-10,0,0,3,0.9,2.5,4,Knockdown,Mid,FALSE,TRUE,FALSE,FALSE,None,0,0,8,8,40,70,120,120,0,FALSE,0,4,Vel=10:0@12-29|NoExtHurt|EX=CR_214M_EX|Fx=spin
+CR_214M_EX,Circle,214M (EX),,Cannonball Roll EX,Special,90,14,8,14,12,2,0,56,3,0.9,0.6,6,Launch,Mid,FALSE,TRUE,FALSE,FALSE,None,0,0,8,8,40,80,130,140,0,FALSE,0,4,"Vel=15:0@8-21|NoExtHurt|Fx=spin,fire"
+CR_623M,Circle,623M,,Flame Riser,Special,75,15,5,8,28,-32,0,30,1,0.9,1.5,9,Launch,Mid,FALSE,TRUE,FALSE,FALSE,Full,1-7,0,8,8,55,160,85,150,0,FALSE,0,4,Vel=3:16@5-12|EX=CR_623M_EX|Fx=fire|SwordFire
+CR_623M_EX,Circle,623M (EX),,Flame Riser EX,Special,95,18,5,8,28,-32,0,0,1,0.9,1.5,10,Hard_Knockdown,Mid,FALSE,TRUE,FALSE,FALSE,Full,1-7,0,8,8,55,160,85,150,0,FALSE,0,4,"Vel=3:16@5-12|Fx=fire,heavy|SwordFire"
+CR_623H,Circle,623H,,Inferno Riser,Special,110,20,9,8,34,-36,0,34,2,0.9,2,12,Launch,Mid,FALSE,TRUE,FALSE,FALSE,None,0,0,8,8,55,175,95,170,0,FALSE,0,4,"Vel=4:20@9-16|EX=CR_623H_EX|Fx=fire,heavy|SwordFire"
+CR_623H_EX,Circle,623H (EX),,Inferno Riser EX,Special,135,24,9,8,34,-36,0,0,2,0.9,2,13,Hard_Knockdown,Mid,FALSE,TRUE,FALSE,FALSE,None,0,0,8,8,55,175,95,170,0,FALSE,0,4,"Vel=4:20@9-16|Fx=fire,heavy|SwordFire"
+CR_j623M,Circle,j.623M,,Air Flame Riser,Special,60,12,5,8,18,-20,0,28,1,0.9,1.5,8,Launch,Mid,FALSE,TRUE,FALSE,FALSE,Full,1-6,0,8,8,55,130,85,150,0,FALSE,0,4,Vel=2:10@5-12|LandEnd|EX=CR_j623M_EX|Fx=fire|SwordFire
+CR_j623M_EX,Circle,j.623M (EX),,Air Flame Riser EX,Special,80,15,5,8,18,-20,0,0,1,0.9,1.5,9,Hard_Knockdown,Mid,FALSE,TRUE,FALSE,FALSE,Full,1-6,0,8,8,55,130,85,150,0,FALSE,0,4,"Vel=2:10@5-12|LandEnd|Fx=fire,heavy|SwordFire"
+CR_j623H,Circle,j.623H,,Air Inferno Riser,Special,90,16,7,8,22,-24,0,30,2,0.9,2,10,Launch,Mid,FALSE,TRUE,FALSE,FALSE,None,0,0,8,8,55,140,95,170,0,FALSE,0,4,"Vel=3:12@7-14|LandEnd|EX=CR_j623H_EX|Fx=fire,heavy|SwordFire"
+CR_j623H_EX,Circle,j.623H (EX),,Air Inferno Riser EX,Special,115,20,7,8,22,-24,0,0,2,0.9,2,11,Hard_Knockdown,Mid,FALSE,TRUE,FALSE,FALSE,None,0,0,8,8,55,140,95,170,0,FALSE,0,4,"Vel=3:12@7-14|LandEnd|Fx=fire,heavy|SwordFire"
+CR_623L,Circle,623L,,Scruff Toss,CmdGrab,60,0,6,3,30,0,0,60,1,0.9,0.3,9,Launch,Unblockable,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,70,100,70,160,0,FALSE,0,2,Grab=18|Fx=heavy
+CR_5U,Circle,5U,,Power Up,Unique,0,0,30,0,12,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,0,2,Script=powerup|Pose=raise|Fx=fire
+CR_5U_BURST,Circle,5U (cancel),,Power Burst,Unique,30,0,6,4,18,-6,0,32,1,0.9,1,7,Launch,Mid,FALSE,TRUE,FALSE,FALSE,None,0,0,8,8,40,110,200,220,0,FALSE,0,2,"Script=powerup|Pose=raise|NoExtHurt|Fx=fire,burst"
+CR_5U_DI,Circle,5U (Dragon Install),,Dragon Blast,Unique,40,8,12,8,16,3,4,0,1,0.9,2.5,0,Normal,Mid,FALSE,TRUE,FALSE,FALSE,None,0,0,8,8,0,110,150,150,0,FALSE,0,2,"Proj=bomb|Dist=230|Fuse=6|Pose=raise|Fx=fire,heavy"
+CR_2U,Circle,2U,,Ground Flare,Unique,30,6,9,6,16,-4,1,0,1,0.9,1.6,0,Normal,Low,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,140,20,130,36,0,FALSE,0,2,NoExtHurt|Fx=fire
+CR_jU,Circle,j.U,,Point Blank,Unique,50,8,8,4,16,-4,0,0,1,0.9,6,4,Knockdown,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,70,90,100,120,0,TRUE,0,2,"Vel=-7:4@8-12|WallBounce|NoExtHurt|Pose=reverse|Fx=fire,heavy"
+CR_214214M,Circle,214214M,,Dragon Install,Super,0,0,10,0,10,0,0,0,1,1,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,Full,1-10,0,12,12,0,0,0,0,0,FALSE,50,0,"Script=dragon|Dur=480|Pose=raise|Fx=fire,burst"
+CR_236236H,Circle,236236H,,Meteor Drive,Super,250,40,8,20,30,-20,0,0,5,1,4,10,Hard_Knockdown,Mid,FALSE,FALSE,FALSE,FALSE,Full,1-12,0,12,12,60,100,150,160,0,FALSE,50,0,"Vel=15:0@8-27|NoExtHurt|Fx=fire,heavy,spin|SwordFire"
+SQ_2L,Square,2L,,Crouch Light,Normal,10,0,7,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,66,18,62,24,0,FALSE,0,1.9,PLACEHOLDER
 SQ_2M,Square,2M,,Crouch Medium,Normal,26,0,8,4,13,-2,1,0,1,0.9,2,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,100,22,104,26,0,FALSE,0,2.5,PLACEHOLDER
 SQ_2H,Square,2H,,Anti-air Launcher,Normal,55,0,9,5,20,-6,0,40,1,1,1.5,11,Launch,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,56,170,82,120,0,FALSE,0,3.7,PLACEHOLDER
 SQ_3H,Square,3H,,Corner Sweep,Command,50,0,11,4,22,-8,0,0,1,0.9,2,0,Knockdown,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,10,10,112,14,126,24,0,FALSE,0,3.5,PLACEHOLDER|Fx=dust
@@ -51,11 +61,11 @@ SQ_214214H,Square,214214H,,Square Barrage,Super,230,35,7,24,30,-18,0,50,6,1,3,12
 SQ_5U,Square,5U,,Prism Ring (Mid),Unique,0,0,10,0,14,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,0,2,Script=ring|RingX=260|RingY=120|RingLife=240|RingCD=180|RingR=70|PLACEHOLDER
 SQ_2U,Square,2U,,Prism Ring (Low),Unique,0,0,10,0,14,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,0,2,Script=ring|RingX=260|RingY=40|RingLife=240|RingCD=180|RingR=70|PLACEHOLDER
 SQ_jU,Square,j.U,,Prism Ring (Angled),Unique,0,0,8,0,12,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,TRUE,0,2,Script=ring|RingX=160|RingY=-150|RingLife=240|RingCD=180|RingR=70|PLACEHOLDER
-TR_5L,Triangle,5L,,Stand Light,Normal,11,0,4,3,7,0,2,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,67,130,61,28,0,FALSE,0,1.9,PLACEHOLDER
-TR_5M,Triangle,5M,,Stand Medium,Normal,28,0,7,4,12,-1,2,0,1,0.9,2.2,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,92,116,88,40,0,FALSE,0,2.6,PLACEHOLDER
-TR_5H,Triangle,5H,,Stand Heavy,Normal,55,0,12,5,20,-5,1,0,1,1,3,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,10,10,103,136,105,70,0,FALSE,0,3.7,PLACEHOLDER
+TR_5L,Triangle,5L,,Stand Light,Normal,11,0,6,3,7,0,2,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,4,4,67,130,61,28,0,FALSE,0,1.9,PLACEHOLDER
+TR_5M,Triangle,5M,,Stand Medium,Normal,28,0,7,4,12,-1,2,0,1,0.9,2.2,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,6,6,92,116,88,40,0,FALSE,0,2.6,PLACEHOLDER
+TR_5H,Triangle,5H,,Stand Heavy,Normal,55,0,12,5,20,-5,1,0,1,1,3,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,103,136,105,70,0,FALSE,0,3.7,PLACEHOLDER
 TR_6M,Triangle,6M,,Apex Overhead,Command,37,0,18,3,16,-2,3,0,1,0.9,3,0,Normal,High,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,76,145,76,72,0,FALSE,0,3,PLACEHOLDER
-TR_2L,Triangle,2L,,Crouch Light,Normal,9,0,4,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,69,18,65,24,0,FALSE,0,1.9,PLACEHOLDER
+TR_2L,Triangle,2L,,Crouch Light,Normal,9,0,7,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,69,18,65,24,0,FALSE,0,1.9,PLACEHOLDER
 TR_2M,Triangle,2M,,Crouch Medium,Normal,24,0,7,4,13,-2,1,0,1,0.9,2,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,105,22,109,26,0,FALSE,0,2.5,PLACEHOLDER
 TR_jL,Triangle,j.L,,Air Light,Normal,8,0,4,4,8,2,4,16,1,0.85,1.2,0,Normal,High,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,61,70,61,40,0,FALSE,0,1.8,PLACEHOLDER
 TR_jM,Triangle,j.M,,Air Medium,Normal,22,0,6,5,12,2,4,18,1,0.9,1.8,0,Normal,High,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,78,46,88,50,0,FALSE,0,2.4,PLACEHOLDER
@@ -68,11 +78,11 @@ TR_214214H,Triangle,214214H,,Disc Storm,Super,180,30,10,60,26,2,0,0,6,1,2,5,Knoc
 TR_5U,Triangle,5U,,Apex Dash (Up-Fwd),Unique,0,0,1,0,15,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,0,2,Vel=9.5:9.5@2-16|Airborne|AirCancel=9|Script=apex|PLACEHOLDER
 TR_2U,Triangle,2U,,Apex Dash (Up-Back),Unique,0,0,1,0,15,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,0,2,Vel=-9:9@2-16|Airborne|AirCancel=9|Script=apex|PLACEHOLDER
 TR_jU,Triangle,j.U,,Apex Dash (Down-Fwd),Unique,0,0,1,0,14,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,TRUE,0,2,Vel=10:-10@1-14|AirCancel=6|LandEnd|Script=apex|PLACEHOLDER
-RH_5L,Rhombus,5L,,Stand Light,Normal,14,0,6,3,7,0,2,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,83,162,75,35,0,FALSE,0,2.1,PLACEHOLDER
-RH_5M,Rhombus,5M,,Stand Medium,Normal,34,0,9,4,12,-1,2,0,1,0.9,2.2,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,114,145,109,50,0,FALSE,0,2.9,PLACEHOLDER
-RH_5H,Rhombus,5H,,Stand Heavy,Normal,69,0,14,5,20,-5,1,0,1,1,3,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,10,10,127,170,130,88,0,FALSE,0,4.3,PLACEHOLDER|Fx=heavy
+RH_5L,Rhombus,5L,,Stand Light,Normal,14,0,6,3,7,0,2,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,4,4,83,162,75,35,0,FALSE,0,2.1,PLACEHOLDER
+RH_5M,Rhombus,5M,,Stand Medium,Normal,34,0,9,4,12,-1,2,0,1,0.9,2.2,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,6,6,114,145,109,50,0,FALSE,0,2.9,PLACEHOLDER
+RH_5H,Rhombus,5H,,Stand Heavy,Normal,69,0,14,5,20,-5,1,0,1,1,3,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,127,170,130,88,0,FALSE,0,4.3,PLACEHOLDER|Fx=heavy
 RH_6M,Rhombus,6M,,Heavy Drop,Command,46,0,20,3,16,-2,3,0,1,0.9,3,0,Normal,High,TRUE,TRUE,FALSE,FALSE,None,0,1,6,6,94,181,94,90,0,FALSE,0,3.3,PLACEHOLDER|Fx=heavy
-RH_2L,Rhombus,2L,,Crouch Light,Normal,12,0,6,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,86,22,81,30,0,FALSE,0,2,PLACEHOLDER
+RH_2L,Rhombus,2L,,Crouch Light,Normal,12,0,7,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,86,22,81,30,0,FALSE,0,2,PLACEHOLDER
 RH_2M,Rhombus,2M,,Crouch Medium,Normal,30,0,9,4,13,-2,1,0,1,0.9,2,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,130,28,135,32,0,FALSE,0,2.7,PLACEHOLDER
 RH_2H,Rhombus,2H,,Anti-air Launcher,Normal,63,0,10,5,20,-6,0,40,1,1,1.5,11,Launch,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,73,212,107,150,0,FALSE,0,4,PLACEHOLDER
 RH_3H,Rhombus,3H,,Sweep,Command,57,0,12,4,22,-8,0,0,1,0.9,2,0,Knockdown,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,10,10,146,18,164,30,0,FALSE,0,3.8,PLACEHOLDER
@@ -90,11 +100,11 @@ RH_214214H,Rhombus,214214H,,Grand Grip,Super,320,0,3,4,50,0,0,0,1,1,3,10,Hard_Kn
 RH_5U,Rhombus,5U,,Grip Shift (High),Unique,0,0,1,0,10,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,0,2,Script=shift|Shift=HM|Dur=90|WalkMul=0.6|PLACEHOLDER
 RH_2U,Rhombus,2U,,Grip Shift (Low),Unique,0,0,1,0,10,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,0,2,Script=shift|Shift=LM|Dur=90|WalkMul=0.6|PLACEHOLDER
 RH_jU,Rhombus,j.U,,Armored Dive,Unique,55,0,8,20,12,-1,3,22,1,0.9,2,0,Normal,High,FALSE,FALSE,FALSE,FALSE,None,0,1,8,8,20,30,120,90,0,FALSE,0,2,Vel=4:-15@8-27|LandEnd|PLACEHOLDER|Fx=quake
-HX_5L,Hexagon,5L,,Stand Light,Normal,12,0,5,3,7,0,2,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,64,130,58,28,0,FALSE,0,2,PLACEHOLDER
-HX_5M,Hexagon,5M,,Stand Medium,Normal,30,0,8,4,12,-1,2,0,1,0.9,2.2,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,88,116,84,40,0,FALSE,0,2.7,PLACEHOLDER
-HX_5H,Hexagon,5H,,Stand Heavy,Normal,60,0,13,5,20,-5,1,0,1,1,3,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,10,10,98,136,100,70,0,FALSE,0,3.9,PLACEHOLDER|Fx=heavy
+HX_5L,Hexagon,5L,,Stand Light,Normal,12,0,6,3,7,0,2,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,4,4,64,130,58,28,0,FALSE,0,2,PLACEHOLDER
+HX_5M,Hexagon,5M,,Stand Medium,Normal,30,0,8,4,12,-1,2,0,1,0.9,2.2,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,6,6,88,116,84,40,0,FALSE,0,2.7,PLACEHOLDER
+HX_5H,Hexagon,5H,,Stand Heavy,Normal,60,0,13,5,20,-5,1,0,1,1,3,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,98,136,100,70,0,FALSE,0,3.9,PLACEHOLDER|Fx=heavy
 HX_6M,Hexagon,6M,,Hex Drop,Command,40,0,19,3,16,-2,3,0,1,0.9,3,0,Normal,High,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,72,145,72,72,0,FALSE,0,3.1,PLACEHOLDER
-HX_2L,Hexagon,2L,,Crouch Light,Normal,10,0,5,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,66,18,62,24,0,FALSE,0,1.9,PLACEHOLDER
+HX_2L,Hexagon,2L,,Crouch Light,Normal,10,0,7,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,66,18,62,24,0,FALSE,0,1.9,PLACEHOLDER
 HX_2M,Hexagon,2M,,Crouch Medium,Normal,26,0,8,4,13,-2,1,0,1,0.9,2,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,100,22,104,26,0,FALSE,0,2.5,PLACEHOLDER
 HX_2H,Hexagon,2H,,Anti-air Launcher,Normal,55,0,9,5,20,-6,0,40,1,1,1.5,11,Launch,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,56,170,82,120,0,FALSE,0,3.7,PLACEHOLDER
 HX_3H,Hexagon,3H,,Sweep,Command,50,0,11,4,22,-8,0,0,1,0.9,2,0,Knockdown,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,10,10,112,14,126,24,0,FALSE,0,3.5,PLACEHOLDER
@@ -111,11 +121,11 @@ HX_214214H,Hexagon,214214H,,Node Rain,Super,0,0,10,0,20,0,0,0,1,1,1.5,0,Normal,M
 HX_5U,Hexagon,5U,,Grid Node (Self),Unique,0,0,10,0,12,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,0,2,Script=node|NodeX=30|NodeY=90|NodeLife=900|NodeMax=3|PLACEHOLDER
 HX_2U,Hexagon,2U,,Grid Node (Ground),Unique,0,0,12,0,12,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,0,2,Script=node|NodeX=300|NodeY=25|NodeLife=900|NodeMax=3|PLACEHOLDER
 HX_jU,Hexagon,j.U,,Grid Node (Air),Unique,0,0,8,0,10,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,TRUE,0,2,Script=node|NodeX=0|NodeY=40|NodeLife=900|NodeMax=3|PLACEHOLDER
-OV_5L,Oval,5L,,Stand Light,Normal,11,0,6,3,7,0,2,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,80,130,72,28,0,FALSE,0,1.9,PLACEHOLDER
-OV_5M,Oval,5M,,Stand Medium,Normal,28,0,9,4,12,-1,2,0,1,0.9,2.2,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,110,116,105,40,0,FALSE,0,2.6,PLACEHOLDER
-OV_5H,Oval,5H,,Stand Heavy,Normal,57,0,14,5,20,-5,1,0,1,1,3,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,10,10,122,136,125,70,0,FALSE,0,3.8,PLACEHOLDER
+OV_5L,Oval,5L,,Stand Light,Normal,11,0,6,3,7,0,2,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,4,4,80,130,72,28,0,FALSE,0,1.9,PLACEHOLDER
+OV_5M,Oval,5M,,Stand Medium,Normal,28,0,9,4,12,-1,2,0,1,0.9,2.2,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,6,6,110,116,105,40,0,FALSE,0,2.6,PLACEHOLDER
+OV_5H,Oval,5H,,Stand Heavy,Normal,57,0,14,5,20,-5,1,0,1,1,3,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,122,136,125,70,0,FALSE,0,3.8,PLACEHOLDER
 OV_6M,Oval,6M,,Overhead,Command,38,0,20,3,16,-2,3,0,1,0.9,3,0,Normal,High,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,90,145,90,72,0,FALSE,0,3,PLACEHOLDER
-OV_2L,Oval,2L,,Crouch Light,Normal,10,0,6,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,82,18,78,24,0,FALSE,0,1.9,PLACEHOLDER
+OV_2L,Oval,2L,,Crouch Light,Normal,10,0,7,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,82,18,78,24,0,FALSE,0,1.9,PLACEHOLDER
 OV_2M,Oval,2M,,Crouch Medium,Normal,25,0,9,4,13,-2,1,0,1,0.9,2,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,125,22,130,26,0,FALSE,0,2.5,PLACEHOLDER
 OV_2H,Oval,2H,,Anti-air Launcher,Normal,52,0,10,5,20,-6,0,40,1,1,1.5,11,Launch,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,70,170,102,120,0,FALSE,0,3.6,PLACEHOLDER
 OV_3H,Oval,3H,,Sweep,Command,48,0,12,4,22,-8,0,0,1,0.9,2,0,Knockdown,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,140,14,158,24,0,FALSE,0,3.4,PLACEHOLDER
@@ -133,11 +143,11 @@ OV_214214H,Oval,214214H,,Bouncing Barrage,Super,180,30,10,70,28,4,0,0,3,1,3,6,Kn
 OV_5U,Oval,5U,,Elastic Stretch,Unique,0,0,1,0,10,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,0,2,Script=stretch|Dur=300|CD=480|ReachMul=1.6|RecAdd=3|PLACEHOLDER
 OV_2U,Oval,2U,,Elastic Stretch,Unique,0,0,1,0,10,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,0,2,Script=stretch|Dur=300|CD=480|ReachMul=1.6|RecAdd=3|PLACEHOLDER
 OV_jU,Oval,j.U,,Elastic Stretch,Unique,0,0,1,0,10,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,TRUE,0,2,Script=stretch|Dur=300|CD=480|ReachMul=1.6|RecAdd=3|PLACEHOLDER
-CC_5L,Cone & Cyl,5L,,Stand Light,Normal,11,0,5,3,7,0,2,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,64,130,58,28,0,FALSE,0,1.9,PLACEHOLDER
-CC_5M,Cone & Cyl,5M,,Stand Medium,Normal,27,0,8,4,12,-1,2,0,1,0.9,2.2,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,88,116,84,40,0,FALSE,0,2.6,PLACEHOLDER
-CC_5H,Cone & Cyl,5H,,Stand Heavy,Normal,54,0,13,5,20,-5,1,0,1,1,3,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,10,10,98,136,100,70,0,FALSE,0,3.7,PLACEHOLDER
+CC_5L,Cone & Cyl,5L,,Stand Light,Normal,11,0,6,3,7,0,2,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,4,4,64,130,58,28,0,FALSE,0,1.9,PLACEHOLDER
+CC_5M,Cone & Cyl,5M,,Stand Medium,Normal,27,0,8,4,12,-1,2,0,1,0.9,2.2,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,6,6,88,116,84,40,0,FALSE,0,2.6,PLACEHOLDER
+CC_5H,Cone & Cyl,5H,,Stand Heavy,Normal,54,0,13,5,20,-5,1,0,1,1,3,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,98,136,100,70,0,FALSE,0,3.7,PLACEHOLDER
 CC_6M,Cone & Cyl,6M,,Overhead,Command,36,0,19,3,16,-2,3,0,1,0.9,3,0,Normal,High,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,72,145,72,72,0,FALSE,0,2.9,PLACEHOLDER
-CC_2L,Cone & Cyl,2L,,Crouch Light,Normal,9,0,5,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,66,18,62,24,0,FALSE,0,1.9,PLACEHOLDER
+CC_2L,Cone & Cyl,2L,,Crouch Light,Normal,9,0,7,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,66,18,62,24,0,FALSE,0,1.9,PLACEHOLDER
 CC_2M,Cone & Cyl,2M,,Crouch Medium,Normal,23,0,8,4,13,-2,1,0,1,0.9,2,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,100,22,104,26,0,FALSE,0,2.4,PLACEHOLDER
 CC_2H,Cone & Cyl,2H,,Anti-air Launcher,Normal,50,0,9,5,20,-6,0,40,1,1,1.5,11,Launch,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,56,170,82,120,0,FALSE,0,3.5,PLACEHOLDER
 CC_3H,Cone & Cyl,3H,,Sweep,Command,45,0,11,4,22,-8,0,0,1,0.9,2,0,Knockdown,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,112,14,126,24,0,FALSE,0,3.3,PLACEHOLDER
@@ -156,11 +166,11 @@ CC_5U,Cone & Cyl,5U (hold),,Puppet Control,Unique,0,0,0,0,0,0,0,0,1,0.9,1.5,0,No
 CC_2U,Cone & Cyl,2U,,Recall,Unique,0,0,0,0,0,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,0,2,Script=recall|PLACEHOLDER
 CC_236236H,Cone & Cyl,236236H,,Duo Assault,Super,240,40,8,22,30,-18,0,0,6,1,4,11,Hard_Knockdown,Mid,FALSE,FALSE,FALSE,FALSE,Full,1-10,0,12,12,44,110,120,150,0,FALSE,50,0,"Vel=11:0@8-24|Puppet=CC_CYL_M|NoExtHurt|PLACEHOLDER|Fx=metal,spin"
 CC_214214H,Cone & Cyl,214214H,,Cylinder Drop,Super,200,35,12,20,30,-8,0,0,1,1,1,4,Hard_Knockdown,Mid,FALSE,FALSE,FALSE,FALSE,Full,1-12,0,12,12,0,0,170,210,0,FALSE,50,0,"Proj=rain|Count=1|PLACEHOLDER|Fx=heavy,quake"
-OC_5L,Octagon,5L,,Stand Light,Normal,12,0,5,3,7,0,2,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,64,130,58,28,0,FALSE,0,2,PLACEHOLDER
-OC_5M,Octagon,5M,,Stand Medium,Normal,30,0,8,4,12,-1,2,0,1,0.9,2.2,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,88,116,84,40,0,FALSE,0,2.7,PLACEHOLDER
-OC_5H,Octagon,5H,,Stand Heavy,Normal,60,0,13,5,20,-5,1,0,1,1,3,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,10,10,98,136,100,70,0,FALSE,0,3.9,PLACEHOLDER
+OC_5L,Octagon,5L,,Stand Light,Normal,12,0,6,3,7,0,2,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,4,4,64,130,58,28,0,FALSE,0,2,PLACEHOLDER
+OC_5M,Octagon,5M,,Stand Medium,Normal,30,0,8,4,12,-1,2,0,1,0.9,2.2,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,6,6,88,116,84,40,0,FALSE,0,2.7,PLACEHOLDER
+OC_5H,Octagon,5H,,Stand Heavy,Normal,60,0,13,5,20,-5,1,0,1,1,3,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,98,136,100,70,0,FALSE,0,3.9,PLACEHOLDER
 OC_6M,Octagon,6M,,Overhead,Command,40,0,19,3,16,-2,3,0,1,0.9,3,0,Normal,High,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,72,145,72,72,0,FALSE,0,3.1,PLACEHOLDER
-OC_2L,Octagon,2L,,Crouch Light,Normal,10,0,5,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,66,18,62,24,0,FALSE,0,1.9,PLACEHOLDER
+OC_2L,Octagon,2L,,Crouch Light,Normal,10,0,7,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,66,18,62,24,0,FALSE,0,1.9,PLACEHOLDER
 OC_2M,Octagon,2M,,Crouch Medium,Normal,26,0,8,4,13,-2,1,0,1,0.9,2,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,100,22,104,26,0,FALSE,0,2.5,PLACEHOLDER
 OC_2H,Octagon,2H,,Anti-air Launcher,Normal,55,0,9,5,20,-6,0,40,1,1,1.5,11,Launch,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,56,170,82,120,0,FALSE,0,3.7,PLACEHOLDER
 OC_3H,Octagon,3H,,Sweep,Command,50,0,11,4,22,-8,0,0,1,0.9,2,0,Knockdown,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,10,10,112,14,126,24,0,FALSE,0,3.5,PLACEHOLDER
@@ -177,11 +187,11 @@ OC_214214H,Octagon,214214H,,Eightfold Strike,Super,250,40,7,24,30,-18,0,0,8,1,4,
 OC_5U,Octagon,5U,,STOP Parry (High/Mid),Unique,0,0,1,7,20,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,0,2,Parry=HM|ParryStun=30|PLACEHOLDER
 OC_2U,Octagon,2U,,STOP Parry (Low/Mid),Unique,0,0,1,7,20,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,0,2,Parry=LM|ParryStun=30|PLACEHOLDER
 OC_jU,Octagon,j.U,,STOP Parry (Air),Unique,0,0,1,7,16,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,TRUE,0,2,Parry=AIR|ParryStun=30|PLACEHOLDER
-SC_5L,Semicircle,5L,,Stand Light,Normal,12,0,5,3,7,0,2,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,64,130,58,28,0,FALSE,0,2,PLACEHOLDER
-SC_5M,Semicircle,5M,,Stand Medium,Normal,30,0,8,4,12,-1,2,0,1,0.9,2.2,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,88,116,84,40,0,FALSE,0,2.7,PLACEHOLDER
-SC_5H,Semicircle,5H,,Stand Heavy,Normal,60,0,13,5,20,-5,1,0,1,1,3,0,Normal,Mid,TRUE,TRUE,FALSE,FALSE,None,0,0,10,10,98,136,100,70,0,FALSE,0,3.9,PLACEHOLDER|Fx=slash
+SC_5L,Semicircle,5L,,Stand Light,Normal,12,0,6,3,7,0,2,0,1,0.85,1.5,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,4,4,64,130,58,28,0,FALSE,0,2,PLACEHOLDER
+SC_5M,Semicircle,5M,,Stand Medium,Normal,30,0,8,4,12,-1,2,0,1,0.9,2.2,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,6,6,88,116,84,40,0,FALSE,0,2.7,PLACEHOLDER
+SC_5H,Semicircle,5H,,Stand Heavy,Normal,60,0,13,5,20,-5,1,0,1,1,3,0,Normal,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,98,136,100,70,0,FALSE,0,3.9,PLACEHOLDER|Fx=slash
 SC_6M,Semicircle,6M,,Arc Drop,Command,40,0,19,3,16,-2,3,0,1,0.9,3,0,Normal,High,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,72,145,72,72,0,FALSE,0,3.1,PLACEHOLDER
-SC_2L,Semicircle,2L,,Crouch Light,Normal,10,0,5,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,66,18,62,24,0,FALSE,0,1.9,PLACEHOLDER
+SC_2L,Semicircle,2L,,Crouch Light,Normal,10,0,7,3,7,-1,1,0,1,0.85,1.4,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,4,4,66,18,62,24,0,FALSE,0,1.9,PLACEHOLDER
 SC_2M,Semicircle,2M,,Crouch Medium,Normal,26,0,8,4,13,-2,1,0,1,0.9,2,0,Normal,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,6,6,100,22,104,26,0,FALSE,0,2.5,PLACEHOLDER
 SC_2H,Semicircle,2H,,Anti-air Launcher,Normal,55,0,9,5,20,-6,0,40,1,1,1.5,11,Launch,Mid,TRUE,TRUE,TRUE,FALSE,None,0,0,10,10,56,170,82,120,0,FALSE,0,3.7,PLACEHOLDER|Fx=slash
 SC_3H,Semicircle,3H,,Sweep,Command,50,0,11,4,22,-8,0,0,1,0.9,2,0,Knockdown,Low,TRUE,TRUE,FALSE,FALSE,None,0,0,10,10,112,14,126,24,0,FALSE,0,3.5,PLACEHOLDER
@@ -240,6 +250,6 @@ ST_SP_FLL,Star,U(FLL),,Ball Lightning (Fire+Lightning+Lightning),Spell,85,15,16,
 ST_SP_ILL,Star,U(ILL),,Static Field (Ice+Lightning+Lightning),Spell,70,12,16,100,18,6,4,0,5,0.9,1,0,Normal,Mid,FALSE,TRUE,FALSE,FALSE,None,0,0,8,8,0,100,180,160,0,TRUE,0,4,"Spell=ILL|Proj=cloud|Dist=180|Freeze=8|PLACEHOLDER|Fx=ice,elec"
 ALL_THROW,ALL,LM,,Throw,Throw,80,0,5,2,24,0,0,0,1,0.9,3,7,Knockdown,Unblockable,FALSE,FALSE,FALSE,FALSE,None,0,0,0,0,0,0,0,0,0,FALSE,0,2,Grab=20|BreakWindow=12|PLACEHOLDER
 ALL_DEAD_ANGLE,ALL,LMH (while blocking),,Dead Angle Attack,System,20,0,12,6,26,-14,0,0,1,0.9,6,6,Knockdown,Mid,FALSE,FALSE,FALSE,FALSE,Full,1-17,0,8,8,80,110,120,140,0,FALSE,25,0,NoExtHurt|PLACEHOLDER|Fx=heavy
-ALL_RC,ALL,LMH,,Roman Cancel,System,0,0,1,0,0,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,50,0,Script=rc|Radius=260|Slow=40|PushBack=12|PLACEHOLDER
+ALL_RC,ALL,LMH,,Roman Cancel,System,0,0,1,0,0,0,0,0,1,0.9,1.5,0,Normal,Mid,FALSE,FALSE,FALSE,FALSE,None,0,0,8,8,0,0,0,0,0,FALSE,50,0,Script=rc|Radius=260|Slow=40|PushBack=12|YellowCost=25|PLACEHOLDER
 ALL_BURST_D,ALL,U+L/M/H (in hit/blockstun),,Defensive Burst,Burst,0,0,9,8,30,-24,0,30,1,0.9,7,10,Launch,Mid,FALSE,FALSE,FALSE,FALSE,Full,1-16,0,8,8,0,110,340,300,0,FALSE,0,0,Burst=def|NoExtHurt|PLACEHOLDER|Fx=burst
 ALL_BURST_O,ALL,U+L/M/H (neutral/attacking),,Offensive Burst,Burst,30,0,8,6,14,2,0,36,1,0.9,1,9,Launch,Mid,FALSE,FALSE,FALSE,FALSE,Full,1-13,0,8,8,0,110,300,280,0,FALSE,0,0,Burst=off|Buff=300|DmgUp=0.15|GrayRegen=1.5|NoExtHurt|PLACEHOLDER|Fx=burst

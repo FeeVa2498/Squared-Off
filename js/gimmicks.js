@@ -21,35 +21,58 @@
   S.rc = function () {};
 
   // ================================================================ CIRCLE
+  // 5U: nạp 1 token (đứng yên, chậm) hoặc cancel từ normal => Power Burst nhanh + token.
+  // Có token / Dragon Install: special có cột EX=ID sẽ thành bản EX. Token dùng là mất.
+  const isStun = (f) => STUNNED.has(f.state);
   GIM.Circle = {
-    init(f) { f.gim.install = 0; },
-    update(f) { if (f.gim.install > 0) f.gim.install--; },
-    press(f, b) {
-      if (b !== 'U') return null;
-      const m = f.c.byId.CR_U_INSTALL;
-      if (m && f.state === 'attack' && f.move && f.move.d.type === 'Special' && f.mf >= f.move.su && f.res() >= m.cost) {
-        f.startMove(m, { force: true });
-        return { done: true };
+    init(f) { f.gim.token = 0; f.gim.di = 0; },
+    update(f) {
+      if (f.gim.di > 0) f.gim.di--;
+      const W = f.w;
+      // aura lửa khi có token / Dragon Install
+      if ((f.gim.token || f.gim.di) && SO.emit && W.parts && W.frame % (f.gim.di ? 2 : 4) === 0 && f.state !== 'ko') {
+        const r = () => Math.random() - 0.5;
+        SO.emit(W, 'flame', f.x + r() * f.c.w, f.y + 10 + Math.random() * f.c.h * (f.gim.di ? 1.1 : 0.7), { vx: r() * 2, vy: 2 + Math.random() * 3, life: 16, size: f.gim.di ? 20 : 13 });
+      }
+    },
+    swap(f, m) {
+      if (m.id === 'CR_5U' && f.gim.di > 0) return f.c.byId.CR_5U_DI;
+      const ex = m.kv.EX && f.c.byId[m.kv.EX];
+      if (!ex) return null;
+      if (f.gim.di > 0) return ex;
+      if (f.gim.token > 0) {
+        f.gim.token = 0;
+        fx(f, { type: 'ring', x: f.x, y: f.y + 90, life: 16, r: 110, color: '#ff4a2a', thick: 6 });
+        return ex;
       }
       return null;
     },
-    modify(f, inst) {
-      if (inst.d.type === 'Special' && f.gim.install > 0) {
-        const k = f.c.byId.CR_U_INSTALL.kv;
-        inst.hits += +k.ExtraHits || 1;
-        inst.dmgMul *= 1 + (+k.DmgUp || 0.2);
-        inst.su = Math.max(3, inst.su - (+k.Faster || 2));
-        inst.enhanced = true;
-        f.gim.install = 0;
-        fx(f, { type: 'ring', x: f.x, y: f.y + 90, life: 14, r: 90, color: '#e0574a', thick: 5 });
-      }
+    press(f, b, p) {
+      if (b !== 'U' || f.isAir() || p.rel <= 3) return null;
+      if (isStun(f)) return null;
+      if (f.gim.di > 0) return { move: f.c.byId.CR_5U_DI };
+      // đang ra đòn: chỉ có bản Power Burst (cancel từ normal special-cancel được)
+      if (f.state === 'attack') return { move: f.c.byId.CR_5U_BURST };
+      return null;
     },
-    hud(f) { return f.gim.install > 0 ? [{ text: 'INSTALL ' + (f.gim.install / 60).toFixed(1) + 's', color: '#e0574a' }] : []; },
+    canStart(f, m) {
+      if (m.id === 'CR_5U_BURST' && f.state !== 'attack') return false;
+      if (m.id === 'CR_5U' && f.state === 'attack') return false;
+    },
+    weaponColor(f) { return f.gim.token || f.gim.di ? '#ff5a3a' : null; },
+    tokens(f) { return f.gim.token; },
+    hud(f) { return f.gim.di > 0 ? [{ text: 'DRAGON INSTALL ' + (f.gim.di / 60).toFixed(1) + 's', color: '#e0302a' }] : []; },
   };
-  S.install = function (f, inst) {
-    f.gim.install = +inst.d.kv.Dur || 180;
-    fx(f, { type: 'ring', x: f.x, y: f.y + 90, life: 20, r: 120, color: '#e0574a', thick: 6 });
-    fx(f, { type: 'text', x: f.x, y: f.y + 230, text: 'ROLLING INSTALL', life: 40, color: '#e0574a' });
+  S.powerup = function (f) {
+    f.gim.token = 1;
+    fx(f, { type: 'ring', x: f.x, y: f.y + 100, life: 22, r: 150, color: '#ff4a2a', thick: 7 });
+    fx(f, { type: 'text', x: f.x, y: f.y + 240, text: 'POWER UP', life: 40, color: '#e0302a' });
+    if (SO.emit) for (let i = 0; i < 20; i++) SO.emit(f.w, 'flame', f.x + (Math.random() - 0.5) * 120, f.y + Math.random() * 60, { vx: (Math.random() - 0.5) * 3, vy: 4 + Math.random() * 6, life: 24, size: 24 });
+  };
+  S.dragon = function (f, inst) {
+    f.gim.di = +inst.d.kv.Dur || 480;
+    fx(f, { type: 'ring', x: f.x, y: f.y + 100, life: 26, r: 220, color: '#e0302a', thick: 9 });
+    fx(f, { type: 'text', x: f.x, y: f.y + 250, text: 'DRAGON INSTALL', life: 50, color: '#e0302a', big: true });
   };
 
   // ================================================================ SQUARE

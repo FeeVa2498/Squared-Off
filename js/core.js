@@ -18,7 +18,11 @@
     KBY: 2, // Knockback_Y * 2 = vận tốc bay lên (px/f)
     PUSH_DECAY: 0.75,
     CROUCH_HITSTUN: 2,
-    CH_HITSTUN: 4,
+    CH_HITSTUN: [0, 3, 5, 8], // hitstun cộng thêm khi counter hit theo cấp L / M / H
+    CH_UNTECH: [0, 6, 10, 16],
+    CH_SLOW: [0, 10, 20, 34], // số frame làm chậm màn hình khi counter hit
+    MIN_PUSH: 1.2, // Knockback_X tối thiểu: đánh trúng/đỡ đều đẩy lùi một chút
+    RC_YELLOW: 25,
     CH_DMG: 1.1,
     PRORATION_FLOOR: 0.1,
     GRAY_RATIO: 0.3,
@@ -41,8 +45,8 @@
     BACK_PENALTY: 0.02,
     BURST_REGEN: 0.02,
     BURST_ON_DMG: 0.08,
-    KD_SOFT: 18,
-    KD_HARD: 40,
+    KD_SOFT: 11, // nằm 11f rồi mới ngồi dậy
+    KD_HARD: 30,
     WAKEUP: 12,
     AIRTECH_INV: 10,
     JUGGLE_DECAY: 0.05,
@@ -375,7 +379,7 @@
       this.pressed = { L: false, M: false, H: false, U: false };
       this.buf = []; // {b, t}
       this.fwdTapT = -99; this.backTapT = -99; this.backStartT = -99;
-      this.downT = -99; this.upT = -99; this.t9 = -99; this.t7 = -99;
+      this.downT = -99; this.upT = -99; this.upTapT = -99; this.t9 = -99; this.t7 = -99;
       this.chg = { 4: { n: 0, last: 0, rel: -99 }, 2: { n: 0, last: 0, rel: -99 } };
       this.compUsedT = -99;
       this.log = []; // lịch sử để hiển thị
@@ -397,7 +401,9 @@
       if (this.rel === 4 && !isB(this.prevRel)) { this.lastBackTap = this.backTapT; this.backTapT = frame; }
       if (isB(this.rel) && !isB(this.prevRel)) this.backStartT = frame;
       if (this.rel <= 3) this.downT = frame;
+      if (this.rel <= 3 && this.prevRel > 3) this.downTaps = (this.downTaps || 0) + 1;
       if (this.rel >= 7) this.upT = frame;
+      if (this.rel >= 7 && this.prevRel < 7) this.upTapT = frame;
       if (this.rel === 9) this.t9 = frame;
       // charge: đếm số frame giữ lùi (1/4/7) và giữ xuống (1/2/3)
       for (const [k, on] of [[4, this.rel === 1 || this.rel === 4 || this.rel === 7], [2, this.rel <= 3]]) {
@@ -459,7 +465,7 @@
     shift() {
       this.buf.forEach((p) => p.t++);
       for (const b of ['L', 'M', 'H', 'U']) if (this.pressT[b] < this.frame) this.pressT[b]++;
-      for (const k of ['fwdTapT', 'lastFwdTap', 'backTapT', 'lastBackTap', 'backStartT', 'downT', 'upT', 't9', 't7', 'compUsedT']) if (this[k] < this.frame && this[k] > -90) this[k]++;
+      for (const k of ['fwdTapT', 'lastFwdTap', 'backTapT', 'lastBackTap', 'backStartT', 'downT', 'upT', 'upTapT', 't9', 't7', 'compUsedT']) if (this[k] < this.frame && this[k] > -90) this[k]++;
     }
     // đã charge đủ hướng k (4 hoặc 2) chưa (đang giữ hoặc vừa nhả trong CHARGE_KEEP frame)
     charged(k, need) {

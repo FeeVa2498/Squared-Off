@@ -174,11 +174,11 @@ def load_original():
 # 2. Khuôn normal dùng chung (mỗi nhân vật nhân hệ số tốc độ / sát thương / tầm)
 # ---------------------------------------------------------------------------
 NORMAL_TEMPLATE = {
-    '5L': dict(name='Stand Light', dmg=12, su=5, act=3, rec=7, ob=0, oh=2, pr=0.85, kbx=1.5, hb=(64, 130, 58, 28)),
-    '5M': dict(name='Stand Medium', dmg=30, su=8, act=4, rec=12, ob=-1, oh=2, pr=0.9, kbx=2.2, hb=(88, 116, 84, 40)),
-    '5H': dict(name='Stand Heavy', dmg=60, su=13, act=5, rec=20, ob=-5, oh=1, pr=1.0, kbx=3.0, hb=(98, 136, 100, 70)),
+    '5L': dict(name='Stand Light', dmg=12, su=6, jc=True, act=3, rec=7, ob=0, oh=2, pr=0.85, kbx=1.5, hb=(64, 130, 58, 28)),
+    '5M': dict(name='Stand Medium', jc=True, dmg=30, su=8, act=4, rec=12, ob=-1, oh=2, pr=0.9, kbx=2.2, hb=(88, 116, 84, 40)),
+    '5H': dict(name='Stand Heavy', jc=True, dmg=60, su=13, act=5, rec=20, ob=-5, oh=1, pr=1.0, kbx=3.0, hb=(98, 136, 100, 70)),
     '6M': dict(name='Overhead', type='Command', dmg=40, su=19, act=3, rec=16, ob=-2, oh=3, kbx=3.0, blk='High', hb=(72, 145, 72, 72)),
-    '2L': dict(name='Crouch Light', dmg=10, su=5, act=3, rec=7, ob=-1, oh=1, pr=0.85, kbx=1.4, blk='Low', hb=(66, 18, 62, 24)),
+    '2L': dict(name='Crouch Light', dmg=10, su=7, act=3, rec=7, ob=-1, oh=1, pr=0.85, kbx=1.4, blk='Low', hb=(66, 18, 62, 24)),
     '2M': dict(name='Crouch Medium', dmg=26, su=8, act=4, rec=13, ob=-2, oh=1, kbx=2.0, blk='Low', hb=(100, 22, 104, 26)),
     '2H': dict(name='Anti-air Launcher', dmg=55, su=9, act=5, rec=20, ob=-6, oh=0, kbx=1.5, kby=11, kbt='Launch', unt=40, jc=True, pr=1.0, hb=(56, 170, 82, 120)),
     '3H': dict(name='Sweep', type='Command', dmg=50, su=11, act=4, rec=22, ob=-8, oh=0, kbx=2.0, kby=0, kbt='Knockdown', blk='Low', hb=(112, 14, 126, 24)),
@@ -200,7 +200,8 @@ def normals(ch, pfx, skip=(), speed=0, dmg=1.0, reach=1.0, over=None, extra_prop
         kw = dict(base)
         kw.setdefault('type', 'Normal')
         x, y, w, h = kw.pop('hb')
-        kw['su'] = max(3, kw['su'] + speed)
+        if inp not in ('5L', '2L'):  # jab chuẩn: 5L = 6f, 2L = 7f
+            kw['su'] = max(3, kw['su'] + speed)
         kw['dmg'] = int(round(kw['dmg'] * dmg))
         hb = (round(x * reach), round(y * yscale), round(w * reach), round(h * yscale))
         if inp in over:
@@ -221,7 +222,7 @@ CHAR_COLS = ['Character', 'Prefix', 'Shape', 'Archetype', 'HP', 'Walk_Fwd', 'Wal
              'Airdash_Frames', 'Air_Jumps', 'Air_Dashes', 'Width', 'Height', 'Throw_Range', 'Color',
              'Weapon', 'Gimmick']
 CHARS = [
-    ['Circle', 'CR', 'circle', 'Rushdown', 950, 4.6, 3.6, 11.0, 20, 19.0, 5.6, 0.95, 15, 16, 1, 1, 110, 168, 150, '#e0574a', 'greatsword', 'Rolling Install: press U right after a special (costs 10%) to boost the next special: +1 hit, +20% damage, 2f faster (3 seconds). 5U rolls forward, 2U rolls back, j.U is a diving roll.'],
+    ['Circle', 'CR', 'circle', 'Rushdown', 950, 4.6, 3.6, 11.0, 20, 19.0, 5.6, 0.95, 15, 16, 1, 1, 110, 168, 150, '#e0574a', 'greatsword', 'Greatsword rushdown. 5U powers up (slow) and stores 1 token: the next special becomes its EX version. Cancel a normal into 5U for a fast burst that launches and gives the token. 214214M Dragon Install: every special is EX, 5U becomes a blast. 623L command grab tosses up for air combos.'],
     ['Square', 'SQ', 'square', 'Shoto / Balanced', 1000, 4.0, 3.3, 10.0, 22, 19.0, 5.0, 0.95, 14, 15, 1, 1, 118, 186, 150, '#3f7fd8', 'longsword', 'Prism Ring: 5U places a mid ring, 2U a low ring, j.U an angled ring. Your projectiles passing through it gain 1.5x speed, 1.5x size and +1 hit. One ring at a time, lasts 4s, 3s cooldown.'],
     ['Triangle', 'TR', 'triangle', 'Vortex / Mobility', 900, 4.4, 3.6, 11.5, 20, 19.5, 5.8, 0.95, 16, 14, 1, 2, 108, 196, 145, '#f2a516', 'dual_blades', 'Apex Dash: 5U dashes diagonally up-forward, 2U up-back, j.U down-forward (can attack after 6f). 236L drops a disc that arms after 30f, made for okizeme. 214L Apex Lunge: a fast dash you can cancel into any attack for range; up close it crosses through for a side swap.'],
     ['Rhombus', 'RH', 'rhombus', 'Grappler', 1200, 2.8, 2.4, 0, 26, 17.0, 4.0, 1.0, 0, 0, 1, 0, 172, 252, 180, '#8a5ac8', 'knuckles', 'Big grappler that cannot run. Grip Shift: 5U armors mid/high hits, 2U armors low/mid hits (90f, normals get 1 armor hit). [4]6H Diamond Charge: armored rush to close the gap. j.U armored dive. 63214H command grab.'],
@@ -237,17 +238,51 @@ CHARS = [
 def build():
     load_original()
 
-    # ===================== CIRCLE =====================
-    normals('Circle', 'CR', skip=('5M',), speed=-1, dmg=0.95,
-            over={'2H': dict(name='Bounce Up'), '3H': dict(name='Roll Sweep')})
-    add('CR_236H', 'Circle', '236H', type='Special', name='Rolling Charge', dmg=70, chip=10, su=14, act=16, rec=14, ob=-6, oh=0, hits=2, kbx=3, kby=5, kbt='Knockdown', props='Vel=12:0@8-29|NoExtHurt', hb=(36, 70, 112, 112))
-    add('CR_j236M', 'Circle', 'j.236M', type='Special', name='Air Dive Roll', dmg=50, chip=8, su=10, act=20, rec=10, ob=-3, oh=2, blk='High', unt=24, kbx=2, props='Vel=8:-12@10-29|LandEnd', hb=(20, 50, 110, 110))
-    add('CR_236236H', 'Circle', '236236H', type='Super', name='Seismic Rush', dmg=240, chip=40, su=8, act=20, rec=30, ob=-20, oh=0, hits=5, kbx=4, kby=10, kbt='Hard_Knockdown', inv='Full', invf='1-12', props='Vel=14:0@8-27|NoExtHurt', hb=(40, 90, 130, 150))
-    add('CR_214214H', 'Circle', '214214H', type='Super', name='Cannonball Crash', dmg=200, chip=30, su=10, act=16, rec=26, ob=-24, oh=0, hits=4, kbx=2, kby=14, kbt='Hard_Knockdown', inv='Full', invf='1-14', props='Vel=5:18@10-25|NoExtHurt', hb=(30, 120, 140, 160))
-    add('CR_U_INSTALL', 'Circle', 'U (after special)', type='Unique', name='Rolling Install', su=1, act=0, rec=8, cost=10, oh=0, ob=0, props='Script=install|Dur=180|DmgUp=0.2|ExtraHits=1|Faster=2')
-    add('CR_5U', 'Circle', '5U', type='Unique', name='Forward Roll', su=1, act=0, rec=23, oh=0, ob=0, inv='Strike', invf='3-14', props='Vel=9:0@3-18')
-    add('CR_2U', 'Circle', '2U', type='Unique', name='Back Roll', su=1, act=0, rec=20, oh=0, ob=0, inv='Strike', invf='1-12', props='Vel=-8:0@3-16')
-    add('CR_jU', 'Circle', 'j.U', type='Unique', name='Dive Roll', dmg=40, su=8, act=12, rec=8, ob=1, oh=3, blk='High', unt=20, kbx=2, props='Vel=9:-10@8-19|LandEnd', hb=(20, 50, 100, 100))
+    # ===================== CIRCLE (thiết kế theo spec của designer) =====================
+    # Đại kiếm. 5U nạp 1 token -> special kế tiếp thành bản EX. 214214M Dragon Install: mọi special là EX.
+    ROWS[:] = [r for r in ROWS if r['Character'] != 'Circle']
+    for i in [x for x in IDS if x.startswith('CR_')]:
+        IDS.discard(i)
+    C_ = 'Circle'
+    P = dict(placeholder=False)
+    # --- normals ---
+    add('CR_5L', C_, '5L', **P, name='Pommel Jab', dmg=12, su=6, act=3, rec=7, ob=1, oh=3, pr=0.85, kbx=1.4, jc=True, props='Pose=pommel', hb=(58, 112, 50, 30))
+    add('CR_cM', C_, 'cM', **P, name='Crushing Chop', dmg=28, su=7, act=4, rec=12, ob=-1, oh=3, kbx=1.8, jc=True, hsa=7, hb=(92, 95, 100, 130))
+    add('CR_fM', C_, 'fM', **P, name='Reverse Reach', dmg=32, su=10, act=4, rec=15, ob=-3, oh=1, kbx=2.3, jc=True, props='Pose=reverse|Vel=3:0@4-9', hb=(165, 112, 160, 42))
+    add('CR_5H', C_, '5H', **P, name='Greatsword Sweep', dmg=70, su=14, act=5, rec=22, ob=-6, oh=4, pr=1.0, kbx=2.6, jc=True, hsa=12, hsd=12, props='Fx=heavy', hb=(150, 112, 190, 76))
+    add('CR_2L', C_, '2L', **P, name='Low Pommel', dmg=10, su=7, act=3, rec=8, ob=-1, oh=2, pr=0.85, kbx=1.3, blk='Low', props='Pose=pommel', hb=(62, 32, 52, 28))
+    add('CR_2M', C_, '2M', **P, name='Low Cleave', dmg=26, su=9, act=4, rec=14, ob=-3, oh=1, kbx=2.0, blk='Low', hb=(150, 34, 170, 36))
+    add('CR_2H', C_, '2H', **P, name='Rising Reverse', dmg=55, su=9, act=5, rec=20, ob=-6, oh=0, pr=1.0, kbx=1.2, kby=11, kbt='Launch', unt=40, jc=True, props='Pose=reverse|Fx=slash', hb=(85, 180, 105, 160))
+    add('CR_3H', C_, '3H', **P, type='Command', name='Back Stab Sweep', dmg=45, su=11, act=4, rec=22, ob=-10, oh=0, kbx=2.0, kby=4, kbt='Knockdown', blk='Low', props='Pose=reverse|Fx=dust', hb=(140, 18, 160, 30))
+    add('CR_6M', C_, '6M', **P, type='Command', name='Hop Pommel', dmg=36, su=19, act=3, rec=10, ob=2, oh=8, kbx=1.5, blk='High', props='Pose=pommel|Vel=4:9@2-3', hb=(66, 120, 66, 80))
+    add('CR_6H', C_, '6H', **P, type='Command', name='Upheave', dmg=40, su=15, act=4, rec=8, ob=2, oh=10, kbx=1.2, jc=False, props='AutoNext=CR_6H2|CH=Launch:7:44', hb=(95, 165, 115, 140))
+    add('CR_6H2', C_, '6H (hit 2)', **P, type='Followup', name='Upheave Slam', dmg=55, su=8, act=4, rec=26, ob=-14, oh=0, kbx=1.5, kby=2, kbt='Knockdown', sc=False, suc=False, hsa=12, hsd=12, props='CHGroundBounce|Fx=heavy,quake', hb=(110, 80, 130, 160))
+    add('CR_jL', C_, 'j.L', **P, name='Air Pommel', dmg=9, su=5, act=4, rec=8, ob=2, oh=4, pr=0.85, kbx=1.0, kby=4, blk='High', unt=16, jc=True, props='Pose=pommel', hb=(60, 105, 64, 80))
+    add('CR_jM', C_, 'j.M', **P, name='Air Downslash', dmg=24, su=7, act=5, rec=12, ob=2, oh=4, kbx=1.0, kby=4, blk='High', unt=20, jc=True, hb=(90, 20, 120, 100))
+    add('CR_jH', C_, 'j.H', **P, name='Turning Reverse Slash', dmg=45, su=10, act=5, rec=18, ob=3, oh=6, pr=1.0, kbx=1.6, kby=5, blk='High', unt=24, props='Pose=reverse', hb=(70, 50, 150, 170))
+    # --- specials (bản EX là dòng *_EX, dùng khi có token hoặc đang Dragon Install) ---
+    add('CR_236L', C_, '236L', **P, type='Special', name='Flame Burst', dmg=45, chip=8, su=13, act=14, rec=20, ob=-13, oh=2, kbx=3, spd=18, props='Proj=ray|Dist=80|Angle=40|EX=CR_236L_EX|Fx=fire', hb=(0, 30, 70, 70))
+    add('CR_236L_EX', C_, '236L (EX)', **P, type='Special', name='Flame Burst EX', dmg=90, chip=15, su=13, act=14, rec=20, ob=-4, oh=0, hits=3, kbx=3, kby=4, kbt='Knockdown', spd=18, props='Proj=ray|Dist=80|Gap=230|Count=3|Step=7|Angle=40|Fx=fire', hb=(0, 30, 80, 80))
+    add('CR_214M', C_, '214M', **P, type='Special', name='Cannonball Roll', dmg=60, chip=10, su=12, act=18, rec=16, ob=-10, oh=0, hits=3, kbx=2.5, kby=4, kbt='Knockdown', props='Vel=10:0@12-29|NoExtHurt|EX=CR_214M_EX|Fx=spin', hb=(40, 70, 120, 120))
+    add('CR_214M_EX', C_, '214M (EX)', **P, type='Special', name='Cannonball Roll EX', dmg=90, chip=14, su=8, act=14, rec=12, ob=2, oh=0, hits=3, kbx=0.6, kby=6, kbt='Launch', unt=56, props='Vel=15:0@8-21|NoExtHurt|Fx=spin,fire', hb=(40, 80, 130, 140))
+    add('CR_623M', C_, '623M', **P, type='Special', name='Flame Riser', dmg=75, chip=15, su=5, act=8, rec=28, ob=-32, oh=0, kbx=1.5, kby=9, kbt='Launch', unt=30, inv='Full', invf='1-7', props='Vel=3:16@5-12|EX=CR_623M_EX|Fx=fire|SwordFire', hb=(55, 160, 85, 150))
+    add('CR_623M_EX', C_, '623M (EX)', **P, type='Special', name='Flame Riser EX', dmg=95, chip=18, su=5, act=8, rec=28, ob=-32, oh=0, kbx=1.5, kby=10, kbt='Hard_Knockdown', inv='Full', invf='1-7', props='Vel=3:16@5-12|Fx=fire,heavy|SwordFire', hb=(55, 160, 85, 150))
+    add('CR_623H', C_, '623H', **P, type='Special', name='Inferno Riser', dmg=110, chip=20, su=9, act=8, rec=34, ob=-36, oh=0, hits=2, kbx=2, kby=12, kbt='Launch', unt=34, props='Vel=4:20@9-16|EX=CR_623H_EX|Fx=fire,heavy|SwordFire', hb=(55, 175, 95, 170))
+    add('CR_623H_EX', C_, '623H (EX)', **P, type='Special', name='Inferno Riser EX', dmg=135, chip=24, su=9, act=8, rec=34, ob=-36, oh=0, hits=2, kbx=2, kby=13, kbt='Hard_Knockdown', props='Vel=4:20@9-16|Fx=fire,heavy|SwordFire', hb=(55, 175, 95, 170))
+    add('CR_j623M', C_, 'j.623M', **P, type='Special', name='Air Flame Riser', dmg=60, chip=12, su=5, act=8, rec=18, ob=-20, oh=0, kbx=1.5, kby=8, kbt='Launch', unt=28, inv='Full', invf='1-6', props='Vel=2:10@5-12|LandEnd|EX=CR_j623M_EX|Fx=fire|SwordFire', hb=(55, 130, 85, 150))
+    add('CR_j623M_EX', C_, 'j.623M (EX)', **P, type='Special', name='Air Flame Riser EX', dmg=80, chip=15, su=5, act=8, rec=18, ob=-20, oh=0, kbx=1.5, kby=9, kbt='Hard_Knockdown', inv='Full', invf='1-6', props='Vel=2:10@5-12|LandEnd|Fx=fire,heavy|SwordFire', hb=(55, 130, 85, 150))
+    add('CR_j623H', C_, 'j.623H', **P, type='Special', name='Air Inferno Riser', dmg=90, chip=16, su=7, act=8, rec=22, ob=-24, oh=0, hits=2, kbx=2, kby=10, kbt='Launch', unt=30, props='Vel=3:12@7-14|LandEnd|EX=CR_j623H_EX|Fx=fire,heavy|SwordFire', hb=(55, 140, 95, 170))
+    add('CR_j623H_EX', C_, 'j.623H (EX)', **P, type='Special', name='Air Inferno Riser EX', dmg=115, chip=20, su=7, act=8, rec=22, ob=-24, oh=0, hits=2, kbx=2, kby=11, kbt='Hard_Knockdown', props='Vel=3:12@7-14|LandEnd|Fx=fire,heavy|SwordFire', hb=(55, 140, 95, 170))
+    add('CR_623L', C_, '623L', **P, type='CmdGrab', name='Scruff Toss', dmg=60, su=6, act=3, rec=30, oh=0, ob=0, kbx=0.3, kby=9, kbt='Launch', unt=60, blk='Unblockable', props='Grab=18|Fx=heavy', hb=(70, 100, 70, 160))
+    # --- U ---
+    add('CR_5U', C_, '5U', **P, type='Unique', name='Power Up', su=30, act=0, rec=12, oh=0, ob=0, props='Script=powerup|Pose=raise|Fx=fire')
+    add('CR_5U_BURST', C_, '5U (cancel)', **P, type='Unique', name='Power Burst', dmg=30, su=6, act=4, rec=18, ob=-6, oh=0, kbx=1.0, kby=7, kbt='Launch', unt=32, sc=False, suc=True, props='Script=powerup|Pose=raise|NoExtHurt|Fx=fire,burst', hb=(40, 110, 200, 220))
+    add('CR_5U_DI', C_, '5U (Dragon Install)', **P, type='Unique', name='Dragon Blast', dmg=40, chip=8, su=12, act=8, rec=16, ob=3, oh=4, kbx=2.5, sc=False, suc=True, props='Proj=bomb|Dist=230|Fuse=6|Pose=raise|Fx=fire,heavy', hb=(0, 110, 150, 150))
+    add('CR_2U', C_, '2U', **P, type='Unique', name='Ground Flare', dmg=30, chip=6, su=9, act=6, rec=16, ob=-4, oh=1, kbx=1.6, blk='Low', sc=False, suc=False, props='NoExtHurt|Fx=fire', hb=(140, 20, 130, 36))
+    add('CR_jU', C_, 'j.U', **P, type='Unique', name='Point Blank', dmg=50, chip=8, su=8, act=4, rec=16, ob=-4, oh=0, kbx=6, kby=4, kbt='Knockdown', air=True, sc=False, props='Vel=-7:4@8-12|WallBounce|NoExtHurt|Pose=reverse|Fx=fire,heavy', hb=(70, 90, 100, 120))
+    # --- supers ---
+    add('CR_214214M', C_, '214214M', **P, type='Super', name='Dragon Install', su=10, act=0, rec=10, oh=0, ob=0, inv='Full', invf='1-10', props='Script=dragon|Dur=480|Pose=raise|Fx=fire,burst')
+    add('CR_236236H', C_, '236236H', **P, type='Super', name='Meteor Drive', dmg=250, chip=40, su=8, act=20, rec=30, ob=-20, oh=0, hits=5, kbx=4, kby=10, kbt='Hard_Knockdown', inv='Full', invf='1-12', props='Vel=15:0@8-27|NoExtHurt|Fx=fire,heavy,spin|SwordFire', hb=(60, 100, 150, 160))
 
     # ===================== SQUARE =====================
     normals('Square', 'SQ', skip=('5M', '6M'), over={'3H': dict(name='Corner Sweep')})
@@ -414,10 +449,24 @@ def build():
         label = '+'.join(els[c] for c in key)
         add('ST_SP_' + key, 'Star', 'U(%s)' % key, type=S, name='%s (%s)' % (nm, label), dmg=dmg, chip=int(dmg * 0.18), su=su, act=act, rec=rec, ob=ob, oh=oh, kbt=kbt, kbx=kbx, kby=kby, unt=unt, hits=hits, spd=spd, air=True, props='Spell=%s|%s' % (key, props), hb=hb)
 
+    # ===================== LUẬT CHUNG =====================
+    # 5L 5M(cM/fM) 5H 2H jump cancel được; 6M 6H không (Star có luật riêng). Jab: 5L 6f, 2L 7f.
+    for r in ROWS:
+        if r['Character'] in ('Star', 'ALL'):
+            continue
+        if r['Input'] in ('5L', '5M', 'cM', 'fM', '5H', '2H'):
+            r['Jump_Cancellable'] = 'TRUE'
+        if r['Input'] in ('6M', '6H'):
+            r['Jump_Cancellable'] = 'FALSE'
+        if r['Input'] == '5L' and r['Character'] != 'Circle':
+            r['Startup'] = '6'
+        if r['Input'] == '2L':
+            r['Startup'] = '7'
+
     # ===================== HỆ THỐNG CHUNG =====================
     add('ALL_THROW', 'ALL', 'LM', type='Throw', name='Throw', dmg=80, su=5, act=2, rec=24, oh=0, ob=0, kbx=3, kby=7, kbt='Knockdown', blk='Unblockable', hsa=0, hsd=0, props='Grab=20|BreakWindow=12')
     add('ALL_DEAD_ANGLE', 'ALL', 'LMH (while blocking)', type='System', name='Dead Angle Attack', dmg=20, su=12, act=6, rec=26, ob=-14, oh=0, kbx=6, kby=6, kbt='Knockdown', inv='Full', invf='1-17', cost=25, gain=0, props='NoExtHurt', hb=(80, 110, 120, 140))
-    add('ALL_RC', 'ALL', 'LMH', type='System', name='Roman Cancel', su=1, act=0, rec=0, oh=0, ob=0, cost=50, gain=0, props='Script=rc|Radius=260|Slow=40|PushBack=12')
+    add('ALL_RC', 'ALL', 'LMH', type='System', name='Roman Cancel', su=1, act=0, rec=0, oh=0, ob=0, cost=50, gain=0, props='Script=rc|Radius=260|Slow=40|PushBack=12|YellowCost=25')
     add('ALL_BURST_D', 'ALL', 'U+L/M/H (in hit/blockstun)', type='Burst', name='Defensive Burst', dmg=0, su=9, act=8, rec=30, ob=-24, oh=0, kbx=7, kby=10, kbt='Launch', unt=30, inv='Full', invf='1-16', gain=0, props='Burst=def|NoExtHurt', hb=(0, 110, 340, 300))
     add('ALL_BURST_O', 'ALL', 'U+L/M/H (neutral/attacking)', type='Burst', name='Offensive Burst', dmg=30, su=8, act=6, rec=14, ob=2, oh=0, kbx=1, kby=9, kbt='Launch', unt=36, inv='Full', invf='1-13', gain=0, props='Burst=off|Buff=300|DmgUp=0.15|GrayRegen=1.5|NoExtHurt', hb=(0, 110, 300, 280))
 
@@ -453,6 +502,8 @@ def apply_fx():
     for r in ROWS:
         fx = FX.get(r['Move_ID'])
         props = r['Properties']
+        if 'Fx=' in props:
+            continue
         if not fx:
             m = re.search(r'Element=(\w)', props)
             if m:

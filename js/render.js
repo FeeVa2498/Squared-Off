@@ -165,16 +165,23 @@
   R.updateCam = function (W) {
     const [a, b] = W.f;
     const mid = (a.x + b.x) / 2;
-    const viewW = C.VIEW_W; // zoom cố định
+    let viewW = C.VIEW_W; // zoom cố định (chỉ zoom vào khi counter hit H)
+    let zx = null, zy = 0;
+    if (W.chZoom) {
+      const z = W.chZoom, k = Math.sin(Math.min(1, z.t / z.life) * Math.PI);
+      viewW = C.VIEW_W / (1 + 0.32 * Math.min(1, k * 1.6));
+      zx = z.x; zy = 0;
+    }
     const scale = R.W / viewW;
-    const camX = SO.clamp(mid - viewW / 2, 0, C.STAGE_W - viewW);
+    const cx = zx === null ? mid : mid + (zx - mid) * 0.7;
+    const camX = SO.clamp(cx - viewW / 2, 0, C.STAGE_W - viewW);
     const top = Math.max(a.y + a.c.h, b.y + b.c.h);
     // chỉ nâng camera khi nhân vật bay cao gần chạm HUD
     // camera nâng lên khi có người bay cao, nhưng người đứng dưới đất vẫn phải thấy phần lớn thân
     const sc0 = R.W / C.VIEW_W;
     const low = a.y < b.y ? a : b;
     const maxOff = (R.H - R.GROUND) / sc0 + Math.max(0, low.y) + low.c.h * 0.3;
-    const offY = Math.min(maxOff, Math.max(0, top - (R.GROUND - 190) / sc0));
+    const offY = Math.min(maxOff, Math.max(0, top - (R.GROUND - 190) / sc0)) + zy;
     const cam = R.cam;
     if (!cam.init) { cam.x = camX; cam.scale = scale; cam.offY = offY; cam.init = true; }
     cam.x = camX;
@@ -310,8 +317,17 @@
   R.weaponPose = function (w, WP) {
     const f = w.f, fc = w.fc, h = w.front.hand;
     const rev = f.c.weapon === 'katana' && f.gim && f.gim.stance === 'Arc';
+    const pose = f.state === 'attack' && f.move ? f.move.d.kv.Pose : null;
     let ang;
-    if (w.target) {
+    if (pose === 'pommel') {
+      // đánh bằng chuôi: lưỡi kiếm cầm ngược, nằm dọc cánh tay chĩa ra sau
+      ang = fc > 0 ? Math.PI + 0.55 : -0.55;
+    } else if (pose === 'raise') {
+      ang = -Math.PI / 2 + fc * 0.08;
+    } else if (w.target && pose === 'reverse') {
+      // cầm ngược: lưỡi quét từ sau ra trước theo tiến độ đòn
+      ang = Math.atan2(w.target.y - h[1], w.target.x - h[0]) + fc * 1.4 * (1 - w.target.k);
+    } else if (w.target) {
       ang = Math.atan2(w.target.y - h[1], w.target.x - h[0]);
       // cầm ngược: lưỡi xoay từ phía sau ra trước theo tiến độ đòn
       if (rev && w.target.k < 1) ang += fc * 2.4 * (1 - w.target.k);
@@ -372,7 +388,20 @@
         const a = w.target ? wt.ang + fc * 0.5 : w.P.guard ? (fc > 0 ? -1.2 : Math.PI + 1.2) : fc > 0 ? ba : Math.PI - ba;
         drawBlade(ctx, h, a, WP, metal(WP.color), ink, seed + 10);
       }
-      if (layer === 'front') drawBlade(ctx, wt.base, wt.ang, WP, metal(WP.color), ink, seed);
+      if (layer === 'front') {
+        const bc = (f.G && f.G.weaponColor && f.G.weaponColor(f)) || WP.color;
+        drawBlade(ctx, wt.base, wt.ang, WP, metal(bc), ink, seed);
+        // kiếm bốc lửa (SwordFire) khi đang ra chiêu lửa, hoặc có token / Dragon Install
+        const swordFire = !ghost && ((f.state === 'attack' && f.move && f.move.d.tags.has('SwordFire')) || (f.gim && (f.gim.token || f.gim.di)));
+        if (swordFire && SO.emit && f.w.parts) {
+          for (let i = 0; i < 2; i++) {
+            const t = 0.3 + Math.random() * 0.7;
+            const px = wt.base[0] + Math.cos(wt.ang) * WP.len * t, py = wt.base[1] + Math.sin(wt.ang) * WP.len * t;
+            // tọa độ local -> world
+            if (f.w.frame % 2 === i) SO.emit(f.w, 'flame', f.x + px, f.y - py, { vx: (Math.random() - 0.5) * 2, vy: 2 + Math.random() * 3, life: 12, size: 10 + Math.random() * 10 });
+          }
+        }
+      }
       return;
     }
     if (WP.pole && layer === 'front') {
@@ -475,8 +504,12 @@
     const limbInk = ghost ? ink : '#3a3a3a';
     const seed = 20 + f.idx * 50;
     if (!ghost && f.invT > 0 && (f.w.frame >> 1) % 2) ctx.globalAlpha *= 0.55;
+    const st = !ghost && f.status;
+    let col2 = col;
+    if (st && st.kind === 'burn') col2 = R.shade(col, -0.35 * (1 - st.t / st.life));
+    if (st && st.kind === 'shock' && (f.w.frame >> 1) % 2) col2 = '#fff6b0';
     ctx.save();
-    ctx.translate(f.x, -f.y);
+    ctx.translate(f.x + (st && st.kind === 'shock' ? (Math.random() - 0.5) * 8 : 0), -f.y);
     if (P.lying) {
       const k = P.lyingT || 0;
       ctx.rotate(-fc * (Math.PI / 2) * (1 - k));
@@ -520,18 +553,24 @@
       if (r.front) frontArm.hand = r.front;
       if (r.back) backArm.hand = r.back;
     }
+    if (f.state === 'attack' && f.move && f.move.d.kv.Pose === 'raise') {
+      // giơ vũ khí lên cao (Circle 5U, Dragon Install)
+      frontArm.hand = [bx + fc * bw * 0.25, shY - c.h * 0.42];
+      backArm.hand = [bx + fc * bw * 0.05, shY - c.h * 0.36];
+    }
     const WP = R.WEAPONS[c.weapon] || null;
     let wTarget = null, magicT = null;
     if (P.armT) {
       const k = P.armT.k === undefined ? 1 : P.armT.k;
       let tx = P.armT.x, ty = -P.armT.y;
       // tay thường không dài ra quá tầm (trừ Oval - nhân vật co giãn); đòn xa của Star hiện phép tại hitbox
-      if (P.armT.hit && !(WP && (WP.blade || WP.pole)) && c.weapon !== 'slingshot') {
+      if (P.armT.hit && !(WP && (WP.blade || WP.pole) && f.move.d.kv.Pose !== 'pommel') && c.weapon !== 'slingshot') {
         const sx = frontArm.sh[0], sy = frontArm.sh[1], dx = tx - sx, dy = ty - sy, dd = Math.hypot(dx, dy) || 1;
         const maxR = c.h * 0.5;
         if (dd > maxR) { magicT = { x: tx, y: ty, k }; tx = sx + (dx / dd) * maxR; ty = sy + (dy / dd) * maxR; }
       }
-      if (WP && (WP.blade || WP.pole) && P.armT.hit) {
+      const mpose = f.state === 'attack' && f.move ? f.move.d.kv.Pose : null;
+      if (WP && (WP.blade || WP.pole) && P.armT.hit && mpose !== 'pommel') {
         // vũ khí dài: tay chỉ vươn tới gần, phần lưỡi chạm vào vùng hitbox
         const sx = frontArm.sh[0], sy = frontArm.sh[1], dx = tx - sx, dy = ty - sy, dd = Math.hypot(dx, dy) || 1;
         const reach = Math.max(dd * 0.35, dd - WP.len * 0.75);
@@ -574,7 +613,14 @@
     R.limb(ctx, [backArm.sh, elbow(backArm), backArm.hand], seed + 1, { width: limbW, stroke: limbInk });
     R.limb(ctx, [backLeg.hip, backLeg.knee, backLeg.foot], seed + 2, { width: limbW + 1, stroke: limbInk });
     const pts = R.shapePoints(c.shape, bw, bh, f.gim.stance).map((p) => [bx + p[0], bodyCY + p[1]]);
-    R.sketchPoly(ctx, pts, seed + 3, { fill: col, stroke: ink, width: 4.5, hatch: ghost ? null : R.shade(col, -0.35) });
+    R.sketchPoly(ctx, pts, seed + 3, { fill: col2, stroke: ink, width: 4.5, hatch: ghost ? null : R.shade(col, -0.35) });
+    if (st && st.kind === 'shock' && (f.w.frame >> 1) % 2) {
+      // giật điện: lộ "xương" kiểu hoạt hình
+      ctx.strokeStyle = '#2a2a2a'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(bx, bodyCY - bh * 0.35); ctx.lineTo(bx, bodyCY + bh * 0.35);
+      for (let i = -1; i <= 1; i++) { ctx.moveTo(bx - bw * 0.25, bodyCY + i * bh * 0.18); ctx.lineTo(bx + bw * 0.25, bodyCY + i * bh * 0.18); }
+      ctx.stroke();
+    }
     if (!ghost) {
       // mắt (không vẽ miệng)
       const ex = bx + fc * bw * 0.16, ey = bodyCY - bh * 0.08;
@@ -793,7 +839,7 @@
     const fadeIn = armed ? Math.min(1, p.t / 3) : 0.35 + 0.25 * Math.sin(p.t * 0.4);
     ctx.globalAlpha = fadeIn;
     switch (p.kind) {
-      case 'straight': case 'angled': {
+      case 'straight': case 'angled': case 'ray': {
         R.sketchEllipse(ctx, p.x, -p.y, p.w / 2, p.h / 2, seed, { fill: col, stroke: INK, width: 3.5, hatch: col2 });
         for (let i = 1; i <= 3; i++) R.sketchLine(ctx, p.x - SO.sign(p.vx || p.facing) * (p.w / 2 + i * 12), -p.y + (i - 2) * 10, p.x - SO.sign(p.vx || p.facing) * (p.w / 2 + i * 12 + 18), -p.y + (i - 2) * 10, seed + i, { stroke: col2, width: 3 });
         if (p.boosted) R.sketchEllipse(ctx, p.x, -p.y, p.w / 2 + 10, p.h / 2 + 10, seed + 4, { stroke: '#3f7fd8', width: 3, fill: null });
@@ -941,9 +987,12 @@
         ctx.lineWidth = 6;
         ctx.strokeStyle = '#fff';
         const y = -e.y - k * 40;
-        ctx.strokeText(e.text, e.x, y);
+        // giữ chữ trong khung hình
+        const half = ctx.measureText(e.text).width / 2 + 10, vw = R.W / (R.cam.scale || 1);
+        const tx = Math.min(Math.max(e.x, R.cam.x + half), R.cam.x + vw - half);
+        ctx.strokeText(e.text, tx, y);
         ctx.fillStyle = e.color || INK;
-        ctx.fillText(e.text, e.x, y);
+        ctx.fillText(e.text, tx, y);
         break;
       }
     }

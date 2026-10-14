@@ -146,6 +146,18 @@
         if (f.state === 'attack' && f.move && f.hitstop <= 0) runEmitters(W, f, f.move, f.mf);
         const cy = f.gim && f.gim.cyl;
         if (cy && cy.st === 'attack' && cy.inst) runEmitters(W, { x: cy.x, y: cy.y, facing: cy.facing, c: { w: 64, h: 110 } }, cy.inst, cy.mf);
+        // trạng thái cháy / giật
+        const st = f.status;
+        if (st) {
+          st.t++;
+          if (st.t >= st.life || f.state === 'idle' || f.state === 'walk') f.status = null;
+          else if (st.kind === 'burn' && W.frame % 2 === 0) {
+            for (let i = 0; i < 2; i++) emit(W, 'flame', f.x + rnd(-f.c.w * 0.45, f.c.w * 0.45), f.y + rnd(10, f.c.h * 0.9), { vx: rnd(-1, 1), vy: rnd(2, 5), life: 16, size: rnd(12, 22) });
+            if (W.frame % 6 === 0) emit(W, 'smoke', f.x + rnd(-30, 30), f.y + f.c.h, { vy: 2.5, life: 26, size: 22, color: 'rgba(70,60,60,0.4)' });
+          } else if (st.kind === 'shock' && W.frame % 3 === 0) {
+            emit(W, 'bolt', f.x + rnd(-f.c.w * 0.6, f.c.w * 0.6), f.y + rnd(20, f.c.h), { life: 5, size: rnd(30, 60), color: st.color, drag: 1 });
+          }
+        }
         // bụi khi dash / chạm đất
         if (f.state === 'dash' && W.frame % 3 === 0) emit(W, 'dust', f.x - f.facing * 30, 6, { vx: -f.facing * 2, vy: 1, life: 18, size: 22, color: 'rgba(170,150,120,0.45)' });
         if (f.state === 'airhit' && f.sf < 12 && f.vy > 5 && W.frame % 2 === 0) for (let i = 0; i < 2; i++) emit(W, 'streak', f.x + rnd(-40, 40), f.y + rnd(20, f.c.h * 0.8), { vx: -f.vx * 1.5, vy: -f.vy * 1.2, drag: 0.8, life: 10, size: 70, color: 'rgba(80,80,80,0.55)' });
@@ -187,6 +199,10 @@
       W.fx.push({ type: 'impact', x, y, t: 0, life: 8 + lvl * 3, size: 24 + lvl * 16, color: ch ? '#d22' : '#222', lvl });
       if (lvl >= 2) W.screenFlash = { t: 0, life: lvl === 3 ? 8 : 4, color: ch ? 'rgba(255,60,40,0.3)' : 'rgba(255,255,255,0.35)' };
       if (lvl >= 2) W.quake = Math.max(W.quake, 4 + lvl * 2);
+      // trạng thái trên người bị đánh: lửa = cháy, điện = giật
+      const names = new Set((d.fx || []).map((x) => x.name));
+      if (names.has('fire')) c.def.status = { kind: 'burn', t: 0, life: 50 };
+      else if (names.has('elec')) c.def.status = { kind: 'shock', t: 0, life: Math.max(18, (c.def.stun || c.def.untech || 20)), color: ((d.fx.find((x) => x.name === 'elec') || {}).color) || '#ffe14d' };
       // hiệu ứng theo nguyên tố khi trúng
       for (const fx of d.fx || []) {
         if (fx.name === 'fire') for (let i = 0; i < 10; i++) emit(W, 'flame', x + rnd(-30, 30), y + rnd(-30, 30), { vx: rnd(-4, 4), vy: rnd(2, 7), life: 20, size: rnd(20, 36) });

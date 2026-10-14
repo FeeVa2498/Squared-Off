@@ -57,7 +57,7 @@
   const S = [];
   S.push({ name: 'Combo Circle 5L>cM>5H', p1: 'Circle', dist: 100, p1seq: ['5L', 'w6', 'M', 'w8', 'H'], frames: 70, check: (r) => r.combo >= 3 });
   S.push({ name: 'Combo Circle 5L>cM>214M', p1: 'Circle', dist: 100, p1seq: ['5L', 'w6', 'M', 'w6', '214M'], frames: 90, check: (r) => r.combo >= 3 });
-  S.push({ name: 'Link +3 vào 5L (4f)', p1: 'Circle', dist: 90, setup: (W, a) => { }, p1seq: ['5L', 'w9', '5L'], frames: 40, check: (r) => r.combo >= 2 });
+  S.push({ name: 'Circle 6M on hit link vào 5L', p1: 'Circle', dist: 120, p1seq: ['6M', 'w32', 'L'], frames: 70, check: (r) => r.m1.includes('CR_5L') && r.combo >= 2 });
   S.push({ name: 'Combo Square 2L>2M>236L', p1: 'Square', dist: 100, p1seq: ['2L', 'w6', '2M', 'w6', '236L'], frames: 120, check: (r) => r.combo >= 3 });
   S.push({ name: 'Gatling không lùi tier (5H>5L bị chặn)', p1: 'Square', dist: 100, p1seq: ['H', 'w12', 'L'], frames: 80, check: (r) => !r.m1.includes('SQ_5L') });
   S.push({ name: 'Jump cancel 5H (on hit)', p1: 'Circle', dist: 100, p1seq: ['H', 'w12', '9:6'], frames: 70, check: (r) => r.p1.includes('air') && r.p1.includes('prejump') });
@@ -71,7 +71,10 @@
   S.push({ name: 'Throw tech khi cùng ném', p1: 'Circle', dist: 100, p1seq: ['w3', 'LM'], p2seq: ['w3', 'LM'], frames: 60, check: (r) => r.p1.includes('recoil') && r.p2.includes('recoil') });
   S.push({ name: 'Throw không bắt người đang nhảy', p1: 'Circle', dist: 100, p2seq: ['8:10'], p1seq: ['w8', 'LM'], frames: 60, check: (r) => !r.p2.includes('thrown') });
   S.push({ name: 'Roman Cancel 5H whiff', p1: 'Circle', dist: 400, eq: 40, p1seq: ['H', 'w3', 'LMH'], frames: 30, check: (r, W, a) => r.eq < 0 && a.state !== 'attack' });
-  S.push({ name: 'Không đủ 50% thì không RC', p1: 'Circle', dist: 400, eq: -40, p1seq: ['H', 'w3', 'LMH'], frames: 12, check: (r, W) => W.eq === -40 });
+  S.push({ name: 'Không đủ 50% thì không RC tím (neutral)', p1: 'Circle', dist: 400, eq: -40, p1seq: ['LMH'], frames: 12, check: (r, W) => W.eq === -40 });
+  S.push({ name: 'RC vàng chỉ tốn 25% (đòn đang startup)', p1: 'Circle', dist: 400, eq: 0, p1seq: ['H', 'w3', 'LMH'], frames: 12, check: (r, W) => Math.abs(W.eq - -50) < 0.5 && W.fx.some((e) => e.text === 'YELLOW ROMAN CANCEL') });
+  S.push({ name: 'RC đỏ khi đối thủ đang bị đánh (50%)', p1: 'Circle', dist: 100, eq: 0, p1seq: ['H', 'w16', 'LMH'], frames: 30, check: (r, W) => W.fx.some((e) => e.text === 'RED ROMAN CANCEL') });
+  S.push({ name: 'RC tím khi đòn whiff đang recovery', p1: 'Circle', dist: 600, eq: 40, p1seq: ['H', 'w22', 'LMH'], frames: 30, check: (r, W) => W.fx.some((e) => e.text === 'PURPLE ROMAN CANCEL') });
   S.push({ name: 'Defensive burst thoát combo', p1: 'Circle', dist: 100, p1seq: ['5L', 'w6', 'M', 'w8', 'H'], p2seq: ['w12', 'UL'], frames: 80, check: (r) => r.m2.includes('ALL_BURST_D') && (r.p1.includes('airhit') || r.p1.includes('block')) });
   S.push({ name: 'Offensive burst + buff', p1: 'Circle', dist: 100, p1seq: ['w3', 'UH'], frames: 40, check: (r, W, a) => r.m1.includes('ALL_BURST_O') && a.buffs.burst > 0 && a.burst < 1 });
   S.push({ name: 'Dead Angle khi block', p1: 'Circle', dist: 100, eq: 0, p1seq: ['w2', 'H'], p2seq: ['4:22', '4+LMH:3', 'w20'], frames: 60, check: (r) => r.m2.includes('ALL_DEAD_ANGLE') });
@@ -92,9 +95,9 @@
   S.push({ name: 'Double jump', p1: 'Square', dist: 600, p1seq: ['8:3', 'w10', '8:3'], frames: 26, check: (r, W, a) => a.airJumps === 0 && !a.superJump });
   S.push({ name: 'Airdash rồi không double jump', p1: 'Square', dist: 600, p1seq: ['8:3', 'w8', '6:2', 'w2', '6:2', 'w3', '8:3'], frames: 30, check: (r, W, a) => r.p1.includes('airdash') && a.airJumps === 1 });
   S.push({ name: 'Super 236236H flash', p1: 'Square', dist: 200, eq: 40, p1seq: ['236236H'], frames: 120, check: (r) => r.m1.includes('SQ_236236H') && r.dmg[1] > 100 });
-  S.push({ name: 'Super 214214H Circle', p1: 'Circle', dist: 100, eq: 40, p1seq: ['214214H'], frames: 120, check: (r) => r.m1.includes('CR_214214H') });
+  S.push({ name: 'Circle Dragon Install 214214M: special là EX, không tốn token', p1: 'Circle', dist: 140, eq: 40, p1seq: ['214214M', 'w50', '214M'], frames: 120, check: (r, W, a) => r.m1.includes('CR_214214M') && r.m1.includes('CR_214M_EX') && a.gim.di > 0 });
   S.push({ name: 'Super không đủ tài nguyên', p1: 'Square', dist: 200, eq: -40, p1seq: ['236236H'], frames: 60, check: (r) => !r.m1.includes('SQ_236236H') });
-  S.push({ name: 'Circle install -> special tăng cường', p1: 'Circle', dist: 120, p1seq: ['236L', 'w14', 'U', 'w8', '214M'], frames: 120, check: (r, W, a) => r.m1.includes('CR_U_INSTALL') && r.m1.includes('CR_214M'), extra: (W, a) => ({ inst: a.gim.install }) });
+  S.push({ name: 'Circle 5U nạp token, special kế tiếp là EX và mất token', p1: 'Circle', dist: 150, p1seq: ['U', 'w45', '214M'], frames: 110, check: (r, W, a) => r.m1.includes('CR_5U') && r.m1.includes('CR_214M_EX') && a.gim.token === 0 });
   S.push({ name: 'Square ring tăng tốc projectile', p1: 'Square', dist: 900, p1seq: ['U', 'w26', '236L'], frames: 90, each: (W, a, b, fr, ev) => { if (W.projs.some((p) => p.boosted)) ev.boost = true; }, check: (r, W, a, b, ev) => ev.boost });
   S.push({ name: 'Triangle apex dash rồi j.H', p1: 'Triangle', dist: 400, p1seq: ['U', 'w10', 'H'], frames: 50, check: (r) => r.m1.includes('TR_5U') && r.m1.includes('TR_jH') });
   S.push({ name: 'Triangle 214L side swap khi ở gần', p1: 'Triangle', dist: 130, p1seq: ['214L'], frames: 40, check: (r, W, a, b) => a.x > b.x });
@@ -121,7 +124,7 @@
   S.push({ name: 'Star FIL = ST_U_3E', p1: 'Star', dist: 250, setup: (W, a) => { a.gim.el = ['L', 'F', 'I']; }, p1seq: ['U'], frames: 90, check: (r) => r.m1.includes('ST_U_3E') && r.dmg[1] > 0 });
   S.push({ name: 'Proration: combo dài sát thương giảm', p1: 'Circle', dist: 100, p1seq: ['5L', 'w6', '5L', 'w6', '5L', 'w6', '5L'], frames: 60, extra: (W, a, b) => b.combo.scale });
   S.push({ name: 'Versus: KO kết thúc round', p1: 'Circle', mode: 'versus', dist: 100, setup: (W, a, b) => { W.phase = 'fight'; b.hp = 5; }, p1seq: ['H'], frames: 400, check: (r, W) => W.score[0] === 1 && W.round === 2 });
-  S.push({ name: 'Air tech sau launch', p1: 'Circle', p2: 'Square', dist: 100, setup: (W) => { W.dummy.tech = true; W.dummy.stance = 'stand'; }, p1seq: ['H'], frames: 90, each: (W, a, b) => { if (b.state === 'airhit' && b.untech > 12) b.untech = 12; }, check: (r) => r.p2.includes('airhit') && r.p2.includes('air') });
+  S.push({ name: 'Air tech sau launch', p1: 'Circle', p2: 'Square', dist: 100, setup: (W) => { W.dummy.tech = true; W.dummy.stance = 'stand'; }, p1seq: ['2H'], frames: 90, each: (W, a, b) => { if (b.state === 'airhit' && b.untech > 12) b.untech = 12; }, check: (r) => r.p2.includes('airhit') && r.p2.includes('air') });
   S.push({ name: 'Crouch hitstun dài hơn', p1: 'Square', dist: 100, p2seq: ['2:60'], p1seq: ['w2', 'L'], frames: 30, extra: (W, a, b) => b.stun });
 
   window.SO_SCEN = function (filter) {
