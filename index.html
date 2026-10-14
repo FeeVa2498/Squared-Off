@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Squared Off</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #2b2a28; --paper: #f6f1e3; }
+  html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
+  body { display: flex; align-items: center; justify-content: center; font-family: "Patrick Hand", "Comic Sans MS", cursive; }
+  canvas { display: block; background: var(--paper); box-shadow: 0 0 40px rgba(0,0,0,.5); image-rendering: auto; outline: none; }
+  body.drag canvas { outline: 6px dashed #e6a700; outline-offset: -6px; }
+  #hint { position: fixed; bottom: 6px; left: 0; right: 0; text-align: center; color: #bbb; font-size: 14px; pointer-events: none; }
+</style>
+</head>
+<body>
+<canvas id="game" tabindex="0"></canvas>
+<script src="js/data.js"></script>
+<script src="js/core.js"></script>
+<script src="js/fighter.js"></script>
+<script src="js/world.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/gimmicks.js"></script>
+<script src="js/render.js"></script>
+<script src="js/game.js"></script>
+<script>document.getElementById('game').focus();</script>
+</body>
+</html>
