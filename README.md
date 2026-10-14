@@ -1,5 +1,7 @@
 # SQUARED OFF — Prototype
 
+**Chơi online:** https://feeva2498.github.io/Squared-Off/
+
 Game đối kháng 2D chạy trên trình duyệt, khung hình cố định 60 FPS, đủ 10 nhân vật. Toàn bộ chữ trong game là tiếng Anh.
 **Mở `index.html` bằng Chrome, Edge hoặc Firefox là chơi được.** Không cần cài đặt hay server.
 
