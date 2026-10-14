@@ -1383,12 +1383,13 @@ window.SO_DATA = {
       // jump cancel / dash cancel
       const inWin = t <= inst.su + inst.act + Math.min(C.CANCEL_EXTRA, inst.rec);
       const upBuf = this.inp.frame - this.inp.upT <= C.BUFFER;
-      if (this.contact === 'hit' && inst.jc && inWin && upBuf && !this.moveAir) {
+      // jump cancel được cả khi trúng lẫn khi bị đỡ
+      if (this.contact && inst.jc && inWin && upBuf && !this.moveAir) {
         this.startJump(this.inp.isUp() ? this.inp.rel : this.inp.dirAt(this.inp.upT), true);
         return;
       }
       // jump cancel trên không = nhảy kép
-      if (this.contact === 'hit' && inst.jc && inWin && this.moveAir && this.inp.frame - this.inp.upTapT <= C.BUFFER &&
+      if (this.contact && inst.jc && inWin && this.moveAir && this.inp.frame - this.inp.upTapT <= C.BUFFER &&
           this.airJumps > 0 && !this.superJump && !this.airdashed) {
         this.airJump(this.inp.dirAt(this.inp.upTapT));
         return;

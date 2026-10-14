@@ -96,7 +96,7 @@ Các tag ngăn cách bằng dấu `|`. Tag dạng `Key=Value` có tác dụng tr
 - **Gatling** đi từ thấp lên cao: L > M > H, và L vào thẳng H được (thường sẽ có gap, không phải true blockstring).
 - **Cùng một nút**, bản đứng và bản ngồi cancel qua lại được (5L <> 2L, 5H > 2H, 2M > cM…), mỗi chiêu một lần trong chuỗi. Gatling M lần hai từ cM sẽ tự ra fM.
 - **Jab** tự gatling vào nhau và vào chính nó (2L 2L 5L 5L). 5L có startup 6f, 2L có startup 7f.
-- **Jump cancel** (khi đòn trúng): 5L, 5M, 5H, 2H. 6M và 6H không jump cancel được. Trên không, jump cancel tức là nhảy kép. Star có luật riêng.
+- **Jump cancel** (khi đòn trúng hoặc bị đỡ): 5L, 5M, 5H, 2H. 6M và 6H không jump cancel được. Trên không, jump cancel tức là nhảy kép. Star có luật riêng.
 - **Super cancel:** chiêu nào special cancel được thì cũng super cancel được.
 - **Pushback:** mọi đòn trúng hoặc bị đỡ đều đẩy đối thủ lùi lại tối thiểu một đoạn.
 - **Knockdown:** đối thủ nằm 11f rồi mới bắt đầu dậy. Hard knockdown là 30f.

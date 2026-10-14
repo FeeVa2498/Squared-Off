@@ -61,6 +61,7 @@
   S.push({ name: 'Combo Square 2L>2M>236L', p1: 'Square', dist: 100, p1seq: ['2L', 'w6', '2M', 'w6', '236L'], frames: 120, check: (r) => r.combo >= 3 });
   S.push({ name: 'Gatling không lùi tier (5H>5L bị chặn)', p1: 'Square', dist: 100, p1seq: ['H', 'w12', 'L'], frames: 80, check: (r) => !r.m1.includes('SQ_5L') });
   S.push({ name: 'Jump cancel 5H (on hit)', p1: 'Circle', dist: 100, p1seq: ['H', 'w12', '9:6'], frames: 70, check: (r) => r.p1.includes('air') && r.p1.includes('prejump') });
+  S.push({ name: 'Jump cancel khi bị đỡ (5H)', p1: 'Circle', dist: 120, block: 'all', p1seq: ['H', 'w20', '9:6'], frames: 60, check: (r) => r.p2.includes('block') && r.p1.includes('prejump') });
   S.push({ name: 'Block all vs 5L', p1: 'Circle', dist: 100, block: 'all', p1seq: ['L'], frames: 40, check: (r) => r.p2.includes('block') && !r.p2.includes('hitstun') });
   S.push({ name: 'Chip damage special khi block', p1: 'Circle', dist: 120, block: 'all', p1seq: ['236L'], frames: 60, check: (r) => r.p2.includes('block') && r.dmg[1] > 0 });
   S.push({ name: 'Low trúng người block đứng', p1: 'Square', dist: 100, p2seq: ['4:60'], p1seq: ['w6', '2L'], frames: 40, check: (r) => r.p2.includes('hitstun') });
